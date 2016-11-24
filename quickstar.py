@@ -560,8 +560,8 @@ class QuickStar(object):
         if len(L) <= 1:
             return L
         return sum((self.quicksorted(partition, partitioning_strategy=partitioning_strategy)
-                    if is_even(i) else partition
                     for i, partition in enumerate(partitioned(L))),
+                    if i % 2 == 0 else partition
                    list())
 
 
