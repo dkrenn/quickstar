@@ -6,6 +6,14 @@ Test-Suites
 Preparation
 -----------
 
+    sage: def alt(n):
+    ....:         return (-1)^n
+
+    sage: def I_even(n):
+    ....:     return (1 + alt(n))/2
+
+    sage: def I_odd(n):
+    ....:     return (1 - alt(n))/2
 
     sage: @cached_function
     ....: def H(n):
@@ -13,6 +21,17 @@ Preparation
     ....:         return 0
     ....:     return H(n-1)+1/n
 
+    sage: @cached_function
+    ....: def H_odd(n):
+    ....:     if n <= 0:
+    ....:         return 0
+    ....:     return H_odd(n-1) + bool(n%2 == 1)/n
+
+    sage: @cached_function
+    ....: def H_alt(n):
+    ....:     if n <= 0:
+    ....:         return 0
+    ....:     return H_alt(n-1) + alt(n)/n
 
 Classical Quicksort
 -------------------
@@ -37,6 +56,45 @@ Classical Quicksort
     n=8, cmp=682272, avg=2369/140
     True
 
+Dual-pivot Quicksort "Count"
+----------------------------
+
+    sage: def comparisons_quicksort_dual(P):
+    ....:     @cached_function
+    ....:     def C(n):
+    ....:         if n == 0:
+    ....:             return 0
+    ....:         return P(n) + (3 / binomial(n, 2) *
+    ....:                        sum((n-1-k) * C(k) for k in srange(1, n-2+1))
+    ....:                        if n >= 2 else 0)
+    ....:     return C
+
+    sage: def X_NE(n):
+    ....:     if n <= 1:
+    ....:         return 0
+    ....:     return H_odd(n-2)/2 - 1/8 + alt(n) / 8 / (n - I_even(n))
+    sage: def P_CT(n):
+    ....:     if n <= 1:
+    ....:         return 0
+    ....:     return 3*n/2 - 9/4 + 1/4/(n - I_even(n)) + X_NE(n)
+    sage: comparisons_quicksort_dual_count = comparisons_quicksort_dual(P_CT)
+
+    sage: all(QuickStar().avg_comparisons_quicksort(
+    ....:         n, 'partitioned_dual_count', verbose=True) ==
+    ....:     comparisons_quicksort_dual_count(n)
+    ....:     for n in srange(9))
+    n=0, cmp=0, avg=0
+    n=1, cmp=0, avg=0
+    n=2, cmp=2, avg=1
+    n=3, cmp=16, avg=8/3
+    n=4, cmp=114, avg=19/4
+    n=5, cmp=866, avg=433/60
+    n=6, cmp=7188, avg=599/60
+    n=7, cmp=65580, avg=1093/84
+    n=8, cmp=655872, avg=244/15
+    True
+
+"""
 class QuickStar(object):
     r"""
 
