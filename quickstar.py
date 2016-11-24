@@ -6,6 +6,8 @@ Test-Suites
 Preparation
 -----------
 
+::
+
     sage: def alt(n):
     ....:         return (-1)^n
 
@@ -59,6 +61,8 @@ Classical Quicksort
 Dual-pivot Quicksort "Count"
 ----------------------------
 
+::
+
     sage: def comparisons_quicksort_dual(P):
     ....:     @cached_function
     ....:     def C(n):
@@ -96,6 +100,8 @@ Dual-pivot Quicksort "Count"
 
 Dual-pivot Quicksort "Clairvoyant"
 ----------------------------------
+
+::
 
     sage: def X_SE(n):
     ....:     if n <= 1:
