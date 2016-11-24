@@ -35,6 +35,93 @@ Preparation
     ....:         return 0
     ....:     return H_alt(n-1) + alt(n)/n
 
+Partitioning Costs
+------------------
+
+Classical Partitioning
+^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+Dual-pivot Partitioning "Count"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+    sage: def X_NE(n):
+    ....:     if n <= 1:
+    ....:         return 0
+    ....:     return H_odd(n-2)/2 - 1/8 + alt(n) / 8 / (n - I_even(n))
+    sage: def P_CT(n):
+    ....:     if n <= 1:
+    ....:         return 0
+    ....:     return 3*n/2 - 9/4 + 1/4/(n - I_even(n)) + X_NE(n)
+
+    sage: all(QuickStar().avg_comparisons_partition(
+    ....:         n, 'partitioned_dual_count', verbose=True) == P_CT(n)
+    ....:     for n in srange(9))
+    n=0, cmp=0, avg=0
+    n=1, cmp=0, avg=0
+    n=2, cmp=2, avg=1
+    n=3, cmp=16, avg=8/3
+    n=4, cmp=102, avg=17/4
+    n=5, cmp=698, avg=349/60
+    n=6, cmp=5304, avg=221/30
+    n=7, cmp=44904, avg=1871/210
+    n=8, cmp=421152, avg=4387/420
+    True
+
+Dual-pivot Partitioning "Clairvoyant"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+    sage: def X_SE(n):
+    ....:     if n <= 1:
+    ....:         return 0
+    ....:     return X_NE(n) - 1/2 + 1/2/(n-I_even(n))
+    sage: def P_CV(n):
+    ....:     if n <= 1:
+    ....:         return 0
+    ....:     return 3*n/2 - 9/4 + 1/4/(n - I_even(n)) - X_SE(n)
+
+    sage: all(QuickStar().avg_comparisons_partition(
+    ....:         n, 'partitioned_dual_clairvoyant', verbose=True) == P_CV(n)
+    ....:     for n in srange(9))
+    n=0, cmp=0, avg=0
+    n=1, cmp=0, avg=0
+    n=2, cmp=2, avg=1
+    n=3, cmp=14, avg=7/3
+    n=4, cmp=90, avg=15/4
+    n=5, cmp=622, avg=311/60
+    n=6, cmp=4776, avg=199/30
+    n=7, cmp=40776, avg=1699/210
+    n=8, cmp=385248, avg=4013/420
+    True
+
+Dual-pivot Partitioning "p first"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+    sage: def P_pF(n):
+    ....:     if n <= 1:
+    ....:         return 0
+    ....:     return 5/3*(n-2) + 1
+
+    sage: all(QuickStar().avg_comparisons_partition(
+    ....:         n, 'partitioned_dual_p_first', verbose=True) == P_pF(n)
+    ....:     for n in srange(9))
+    n=0, cmp=0, avg=0
+    n=1, cmp=0, avg=0
+    n=2, cmp=2, avg=1
+    n=3, cmp=16, avg=8/3
+    n=4, cmp=104, avg=13/3
+    n=5, cmp=720, avg=6
+    n=6, cmp=5520, avg=23/3
+    n=7, cmp=47040, avg=28/3
+    n=8, cmp=443520, avg=11
+    True
 
 Quicksort
 ---------
@@ -76,15 +163,6 @@ Dual-pivot Quicksort "Count"
     ....:                        sum((n-1-k) * C(k) for k in srange(1, n-2+1))
     ....:                        if n >= 2 else 0)
     ....:     return C
-
-    sage: def X_NE(n):
-    ....:     if n <= 1:
-    ....:         return 0
-    ....:     return H_odd(n-2)/2 - 1/8 + alt(n) / 8 / (n - I_even(n))
-    sage: def P_CT(n):
-    ....:     if n <= 1:
-    ....:         return 0
-    ....:     return 3*n/2 - 9/4 + 1/4/(n - I_even(n)) + X_NE(n)
     sage: comparisons_quicksort_dual_count = comparisons_quicksort_dual(P_CT)
 
     sage: all(QuickStar().avg_comparisons_quicksort(
@@ -107,14 +185,6 @@ Dual-pivot Quicksort "Clairvoyant"
 
 ::
 
-    sage: def X_SE(n):
-    ....:     if n <= 1:
-    ....:         return 0
-    ....:     return X_NE(n) - 1/2 + 1/2/(n-I_even(n))
-    sage: def P_CV(n):
-    ....:     if n <= 1:
-    ....:         return 0
-    ....:     return 3*n/2 - 9/4 + 1/4/(n - I_even(n)) - X_SE(n)
     sage: comparisons_quicksort_dual_clairvoyant = comparisons_quicksort_dual(P_CV) 
     sage: all(QuickStar().avg_comparisons_quicksort(
     ....:         n, 'partitioned_dual_clairvoyant', verbose=True) ==
@@ -136,10 +206,6 @@ Dual-pivot Quicksort "p first"
 
 ::
 
-    sage: def P_pF(n):
-    ....:     if n <= 1:
-    ....:         return 0
-    ....:     return 5/3*(n-2) + 1
     sage: comparisons_quicksort_dual_p_first = comparisons_quicksort_dual(P_pF) 
     sage: all(QuickStar().avg_comparisons_quicksort(
     ....:         n, 'partitioned_dual_p_first', verbose=True) ==
