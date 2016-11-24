@@ -1,5 +1,53 @@
 class QuickStar(object):
-    
+    r"""
+
+    EXAMPLES:
+
+    Classical quicksort::
+
+        sage: qs = QuickStar()
+        sage: qs.quicksorted([2,1,3,5]), qs.comparisons
+        ([1, 2, 3, 5], 4)
+
+        sage: qs = QuickStar()
+        sage: n = 4
+        sage: E = srange(n)
+        sage: pis = Permutations(E)
+        sage: assert all(qs.quicksorted(pi) == E for pi in pis)
+        sage: qs.comparisons
+        116
+
+    Dual-pivot quicksort::
+
+        sage: qs = QuickStar()
+        sage: qs.quicksorted([2,1,3,5], 'partitioned_dual_count'), qs.comparisons
+        ([1, 2, 3, 5], 5)
+
+        sage: qs = QuickStar()
+        sage: n = 4
+        sage: E = srange(n)
+        sage: pis = Permutations(E)
+        sage: assert all(qs.quicksorted(pi, 'partitioned_dual_count') == E for pi in pis)
+        sage: qs.comparisons
+        114
+
+    Classical quickselect::
+
+        sage: qs = QuickStar()
+        sage: qs.quickselected([2,1,3,0], 0), qs.comparisons
+        (0, 4)
+
+    Dual-pivot quickselect::
+
+        sage: qs = QuickStar()
+        sage: n = 4
+        sage: E = srange(n)
+        sage: pis = Permutations(E)
+        sage: assert all(qs.quickselected(pi, j, 'partitioned_dual_count') == j for pi in pis for j in srange(n))
+        sage: qs.comparisons
+        432
+    """
+
     comparisons = 0
     
 
