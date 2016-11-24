@@ -17,7 +17,7 @@ class QuickStar(object):
         sage: qs.comparisons
         116
 
-    Dual-pivot quicksort::
+    Dual-pivot quicksort "count"::
 
         sage: qs = QuickStar()
         sage: qs.quicksorted([2,1,3,5], 'partitioned_dual_count'), qs.comparisons
@@ -37,7 +37,7 @@ class QuickStar(object):
         sage: qs.quickselected([2,1,3,0], 0), qs.comparisons
         (0, 4)
 
-    Dual-pivot quickselect::
+    Dual-pivot quickselect "count"::
 
         sage: qs = QuickStar()
         sage: n = 4
@@ -258,6 +258,7 @@ class QuickStar(object):
                     for i, partition in enumerate(partitioned(L))),
                    list())
 
+
     def quickselected(self, L, j, partitioning_strategy='partitioned_classic'):
         partitioned = getattr(self, partitioning_strategy)
         if len(L) == 0:
@@ -272,3 +273,17 @@ class QuickStar(object):
                 return self.quickselected(partition, j - m + len(partition),
                                           partitioning_strategy=partitioning_strategy)
         raise ValueError('index out of range')
+
+
+    def avg_comparisons_quicksort(self, n, partitioning_strategy, verbose=False):
+        r"""
+        """
+        E = srange(n)
+        pis = Permutations(E)
+        assert all(self.quicksorted(list(pi), partitioning_strategy) == E
+                   for pi in pis)
+        if verbose:
+            print('n={}, cmp={}, avg={}'.format(
+                n, self.comparisons, self.comparisons / n.factorial()))
+        return self.comparisons / n.factorial()
+
