@@ -607,6 +607,24 @@ class QuickStar(object):
         raise ValueError('index out of range')
 
 
+    def avg_comparisons_partition(self, n, partitioning_strategy,
+                                  verbose=False, **kwds):
+        r"""
+        """
+        from sage.arith.srange import srange
+        from sage.combinat.permutation import Permutations
+        partitioned = getattr(self, partitioning_strategy)
+        E = srange(n)
+        pis = Permutations(E)
+        assert all(
+            sum((sorted(c) for c in partitioned(list(pi), **kwds)), list()) == E
+            for pi in pis)
+        if verbose:
+            print('n={}, cmp={}, avg={}'.format(
+                n, self.comparisons, self.comparisons / n.factorial()))
+        return self.comparisons / n.factorial()
+
+
     def avg_comparisons_quicksort(self, n, partitioning_strategy,
                                   verbose=False, **kwds):
         r"""
