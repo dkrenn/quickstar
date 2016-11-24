@@ -1,3 +1,42 @@
+r"""
+
+Test-Suites
+===========
+
+Preparation
+-----------
+
+
+    sage: @cached_function
+    ....: def H(n):
+    ....:     if n <= 0:
+    ....:         return 0
+    ....:     return H(n-1)+1/n
+
+
+Classical Quicksort
+-------------------
+
+::
+
+    sage: def comparisons_quicksort_classic(n):
+    ....:     return 2 * (n+1) * H(n) - 4*n
+
+    sage: all(QuickStar().avg_comparisons_quicksort(
+    ....:         n, 'partitioned_classic', verbose=True) ==
+    ....:     comparisons_quicksort_classic(n)
+    ....:     for n in srange(9))
+    n=0, cmp=0, avg=0
+    n=1, cmp=0, avg=0
+    n=2, cmp=2, avg=1
+    n=3, cmp=16, avg=8/3
+    n=4, cmp=116, avg=29/6
+    n=5, cmp=888, avg=37/5
+    n=6, cmp=7416, avg=103/10
+    n=7, cmp=67968, avg=472/35
+    n=8, cmp=682272, avg=2369/140
+    True
+
 class QuickStar(object):
     r"""
 
