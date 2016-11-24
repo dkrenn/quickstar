@@ -234,6 +234,74 @@ Dual-pivot Quickselect "Count"
     n=6, j=4, cmp=6312, avg=263/30
     n=6, j=5, cmp=5916, avg=493/60
     True
+
+Dual-pivot Quickselect "Clairvoyant"
+------------------------------------
+
+::
+
+    sage: comparisons_quickselect_dual_clairvoyant = comparisons_quickselect_dual(P_CV)
+
+    sage: all(QuickStar().avg_comparisons_quickselect(
+    ....:         n, j, 'partitioned_dual_clairvoyant', verbose=True) ==
+    ....:     comparisons_quickselect_dual_clairvoyant(n, j+1)
+    ....:     for n in srange(7) for j in srange(n))
+    n=1, j=0, cmp=0, avg=0
+    n=2, j=0, cmp=2, avg=1
+    n=2, j=1, cmp=2, avg=1
+    n=3, j=0, cmp=14, avg=7/3
+    n=3, j=1, cmp=14, avg=7/3
+    n=3, j=2, cmp=14, avg=7/3
+    n=4, j=0, cmp=94, avg=47/12
+    n=4, j=1, cmp=98, avg=49/12
+    n=4, j=2, cmp=98, avg=49/12
+    n=4, j=3, cmp=94, avg=47/12
+    n=5, j=0, cmp=674, avg=337/60
+    n=5, j=1, cmp=714, avg=119/20
+    n=5, j=2, cmp=730, avg=73/12
+    n=5, j=3, cmp=714, avg=119/20
+    n=5, j=4, cmp=674, avg=337/60
+    n=6, j=0, cmp=5332, avg=1333/180
+    n=6, j=1, cmp=5688, avg=79/10
+    n=6, j=2, cmp=5900, avg=295/36
+    n=6, j=3, cmp=5900, avg=295/36
+    n=6, j=4, cmp=5688, avg=79/10
+    n=6, j=5, cmp=5332, avg=1333/180
+    True
+
+Dual-pivot Quickselect "p first"
+--------------------------------
+
+::
+
+    sage: comparisons_quickselect_dual_p_first = comparisons_quickselect_dual(P_pF)
+
+    sage: all(QuickStar().avg_comparisons_quickselect(
+    ....:         n, j, 'partitioned_dual_p_first', verbose=True) ==
+    ....:     comparisons_quickselect_dual_p_first(n, j+1)
+    ....:     for n in srange(7) for j in srange(n))
+    n=1, j=0, cmp=0, avg=0
+    n=2, j=0, cmp=2, avg=1
+    n=2, j=1, cmp=2, avg=1
+    n=3, j=0, cmp=16, avg=8/3
+    n=3, j=1, cmp=16, avg=8/3
+    n=3, j=2, cmp=16, avg=8/3
+    n=4, j=0, cmp=108, avg=9/2
+    n=4, j=1, cmp=112, avg=14/3
+    n=4, j=2, cmp=112, avg=14/3
+    n=4, j=3, cmp=108, avg=9/2
+    n=5, j=0, cmp=776, avg=97/15
+    n=5, j=1, cmp=820, avg=41/6
+    n=5, j=2, cmp=840, avg=7
+    n=5, j=3, cmp=820, avg=41/6
+    n=5, j=4, cmp=776, avg=97/15
+    n=6, j=0, cmp=6136, avg=767/90
+    n=6, j=1, cmp=6536, avg=817/90
+    n=6, j=2, cmp=6792, avg=283/30
+    n=6, j=3, cmp=6792, avg=283/30
+    n=6, j=4, cmp=6536, avg=817/90
+    n=6, j=5, cmp=6136, avg=767/90
+    True
 """
 
 class QuickStar(object):
