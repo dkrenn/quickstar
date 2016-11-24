@@ -35,8 +35,12 @@ Preparation
     ....:         return 0
     ....:     return H_alt(n-1) + alt(n)/n
 
+
+Quicksort
+---------
+
 Classical Quicksort
--------------------
+^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -59,7 +63,7 @@ Classical Quicksort
     True
 
 Dual-pivot Quicksort "Count"
-----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -99,7 +103,7 @@ Dual-pivot Quicksort "Count"
     True
 
 Dual-pivot Quicksort "Clairvoyant"
-----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -128,7 +132,7 @@ Dual-pivot Quicksort "Clairvoyant"
     True
 
 Dual-pivot Quicksort "p first"
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -152,8 +156,11 @@ Dual-pivot Quicksort "p first"
     n=8, cmp=682272, avg=2369/140
     True
 
+Quickselect
+-----------
+
 Classical Quickselect
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -187,7 +194,7 @@ Classical Quickselect
     True
 
 Dual-pivot Quickselect "Count"
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -236,7 +243,7 @@ Dual-pivot Quickselect "Count"
     True
 
 Dual-pivot Quickselect "Clairvoyant"
-------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -270,7 +277,7 @@ Dual-pivot Quickselect "Clairvoyant"
     True
 
 Dual-pivot Quickselect "p first"
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
