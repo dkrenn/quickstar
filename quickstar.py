@@ -554,8 +554,27 @@ class QuickStar(object):
                         medium.append(element)
         return small, pivot, medium, qivot, large
 
-    
-    def quicksorted(self, L, partitioning_strategy='partitioned_classic'):
+
+    def partitioned_polytopes(self, L, polytopes):
+        d = polytopes[0].polytope.ambient_dim()
+        iterL = iter(L)
+
+        pivots = sorted(next(iterL) for _ in range(d-1))  # TODO: costs
+        self.comparisons += 1     # TODO: costs
+
+        classified = tuple([] for _ in range(d))
+        counts = [0 for _ in range(d)]
+
+        for element in iterL:
+            p = next(pp for pp in polytopes if pp.polytope.contains(counts))
+            classification, comparisons = p.classify_element(element, pivots)
+            self.comparisons += comparisons
+            classified[classification].append(element)
+            counts[classification] += 1
+
+        return (classified[0],) + \
+            sum(zip(([p] for p in pivots), classified[1:]), tuple())
+
 
     def quicksorted(self, L, partitioning_strategy='partitioned_classic',
                     **kwds):
