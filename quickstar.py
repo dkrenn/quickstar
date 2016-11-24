@@ -584,6 +584,8 @@ class QuickStar(object):
     def avg_comparisons_quicksort(self, n, partitioning_strategy, verbose=False):
         r"""
         """
+        from sage.arith.srange import srange
+        from sage.combinat.permutation import Permutations
         E = srange(n)
         pis = Permutations(E)
         assert all(self.quicksorted(list(pi), partitioning_strategy) == E
@@ -597,6 +599,8 @@ class QuickStar(object):
     def avg_comparisons_quickselect(self, n, j, partitioning_strategy, verbose=False):
         r"""
         """
+        from sage.arith.srange import srange
+        from sage.combinat.permutation import Permutations
         E = srange(n)
         pis = Permutations(E)
         assert all(self.quickselected(list(pi), j, partitioning_strategy) == j
