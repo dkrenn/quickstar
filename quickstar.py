@@ -556,39 +556,47 @@ class QuickStar(object):
 
     
     def quicksorted(self, L, partitioning_strategy='partitioned_classic'):
+
+    def quicksorted(self, L, partitioning_strategy='partitioned_classic',
+                    **kwds):
         partitioned = getattr(self, partitioning_strategy)
         if len(L) <= 1:
             return L
-        return sum((self.quicksorted(partition, partitioning_strategy=partitioning_strategy)
-                    for i, partition in enumerate(partitioned(L))),
+        return sum((self.quicksorted(partition,
+                                     partitioning_strategy=partitioning_strategy,
+                                     **kwds)
                     if i % 2 == 0 else partition
+                    for i, partition in enumerate(partitioned(L, **kwds))),
                    list())
 
 
-    def quickselected(self, L, j, partitioning_strategy='partitioned_classic'):
+    def quickselected(self, L, j, partitioning_strategy='partitioned_classic',
+                      **kwds):
         partitioned = getattr(self, partitioning_strategy)
         if len(L) == 0:
             raise ValueError('empty list')
         if len(L) == 1:
             return L[0]
-        partitions = partitioned(L)
+        partitions = partitioned(L, **kwds)
         m = 0
         for partition in partitions:
             m += len(partition)
             if j < m:
                 return self.quickselected(partition, j - m + len(partition),
-                                          partitioning_strategy=partitioning_strategy)
+                                          partitioning_strategy=partitioning_strategy,
+                                          **kwds)
         raise ValueError('index out of range')
 
 
-    def avg_comparisons_quicksort(self, n, partitioning_strategy, verbose=False):
+    def avg_comparisons_quicksort(self, n, partitioning_strategy,
+                                  verbose=False, **kwds):
         r"""
         """
         from sage.arith.srange import srange
         from sage.combinat.permutation import Permutations
         E = srange(n)
         pis = Permutations(E)
-        assert all(self.quicksorted(list(pi), partitioning_strategy) == E
+        assert all(self.quicksorted(list(pi), partitioning_strategy, **kwds) == E
                    for pi in pis)
         if verbose:
             print('n={}, cmp={}, avg={}'.format(
@@ -596,14 +604,15 @@ class QuickStar(object):
         return self.comparisons / n.factorial()
 
 
-    def avg_comparisons_quickselect(self, n, j, partitioning_strategy, verbose=False):
+    def avg_comparisons_quickselect(self, n, j, partitioning_strategy,
+                                    verbose=False, **kwds):
         r"""
         """
         from sage.arith.srange import srange
         from sage.combinat.permutation import Permutations
         E = srange(n)
         pis = Permutations(E)
-        assert all(self.quickselected(list(pi), j, partitioning_strategy) == j
+        assert all(self.quickselected(list(pi), j, partitioning_strategy, **kwds) == j
                    for pi in pis)
         if verbose:
             print('n={}, j={}, cmp={}, avg={}'.format(
