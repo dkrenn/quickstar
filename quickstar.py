@@ -151,6 +151,41 @@ Dual-pivot Quicksort "p first"
     n=7, cmp=67968, avg=472/35
     n=8, cmp=682272, avg=2369/140
     True
+
+Classical Quickselect
+---------------------
+
+::
+
+    sage: def comparisons_quickselect_classic(n, j):
+    ....:     j = j + 1
+    ....:     return 2 * (n + 3 + (n+1)*H(n) - (j+2)*H(j) - (n+3-j)*H(n+1-j))
+    sage: all(QuickStar().avg_comparisons_quickselect(
+    ....:         n, j, 'partitioned_classic', verbose=True) ==
+    ....:     comparisons_quickselect_classic(n, j)
+    ....:     for n in srange(7) for j in srange(n))
+    n=1, j=0, cmp=0, avg=0
+    n=2, j=0, cmp=2, avg=1
+    n=2, j=1, cmp=2, avg=1
+    n=3, j=0, cmp=14, avg=7/3
+    n=3, j=1, cmp=16, avg=8/3
+    n=3, j=2, cmp=14, avg=7/3
+    n=4, j=0, cmp=92, avg=23/6
+    n=4, j=1, cmp=108, avg=9/2
+    n=4, j=2, cmp=108, avg=9/2
+    n=4, j=3, cmp=92, avg=23/6
+    n=5, j=0, cmp=652, avg=163/30
+    n=5, j=1, cmp=768, avg=32/5
+    n=5, j=2, cmp=808, avg=101/15
+    n=5, j=3, cmp=768, avg=32/5
+    n=5, j=4, cmp=652, avg=163/30
+    n=6, j=0, cmp=5112, avg=71/10
+    n=6, j=1, cmp=6000, avg=25/3
+    n=6, j=2, cmp=6456, avg=269/30
+    n=6, j=3, cmp=6456, avg=269/30
+    n=6, j=4, cmp=6000, avg=25/3
+    n=6, j=5, cmp=5112, avg=71/10
+    True
 """
 class QuickStar(object):
     r"""
@@ -441,3 +476,15 @@ class QuickStar(object):
                 n, self.comparisons, self.comparisons / n.factorial()))
         return self.comparisons / n.factorial()
 
+
+    def avg_comparisons_quickselect(self, n, j, partitioning_strategy, verbose=False):
+        r"""
+        """
+        E = srange(n)
+        pis = Permutations(E)
+        assert all(self.quickselected(list(pi), j, partitioning_strategy) == j
+                   for pi in pis)
+        if verbose:
+            print('n={}, j={}, cmp={}, avg={}'.format(
+                n, j, self.comparisons, self.comparisons / n.factorial()))
+        return self.comparisons / n.factorial()
