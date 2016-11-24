@@ -94,6 +94,34 @@ Dual-pivot Quicksort "Count"
     n=8, cmp=655872, avg=244/15
     True
 
+Dual-pivot Quicksort "Clairvoyant"
+----------------------------------
+
+    sage: def X_SE(n):
+    ....:     if n <= 1:
+    ....:         return 0
+    ....:     return X_NE(n) - 1/2 + 1/2/(n-I_even(n))
+    sage: def P_CV(n):
+    ....:     if n <= 1:
+    ....:         return 0
+    ....:     return 3*n/2 - 9/4 + 1/4/(n - I_even(n)) - X_SE(n)
+    sage: comparisons_quicksort_dual_clairvoyant = comparisons_quicksort_dual(P_CV) 
+    sage: all(QuickStar().avg_comparisons_quicksort(
+    ....:         n, 'partitioned_dual_clairvoyant', verbose=True) ==
+    ....:     comparisons_quicksort_dual_clairvoyant(n)
+    ....:     for n in srange(9))
+    n=0, cmp=0, avg=0
+    n=1, cmp=0, avg=0
+    n=2, cmp=2, avg=1
+    n=3, cmp=14, avg=7/3
+    n=4, cmp=102, avg=17/4
+    n=5, cmp=778, avg=389/60
+    n=6, cmp=6492, avg=541/60
+    n=7, cmp=59484, avg=4957/420
+    n=8, cmp=597216, avg=6221/420
+    True
+
+
 """
 class QuickStar(object):
     r"""
