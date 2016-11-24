@@ -158,11 +158,10 @@ Classical Quickselect
 ::
 
     sage: def comparisons_quickselect_classic(n, j):
-    ....:     j = j + 1
     ....:     return 2 * (n + 3 + (n+1)*H(n) - (j+2)*H(j) - (n+3-j)*H(n+1-j))
     sage: all(QuickStar().avg_comparisons_quickselect(
     ....:         n, j, 'partitioned_classic', verbose=True) ==
-    ....:     comparisons_quickselect_classic(n, j)
+    ....:     comparisons_quickselect_classic(n, j+1)
     ....:     for n in srange(7) for j in srange(n))
     n=1, j=0, cmp=0, avg=0
     n=2, j=0, cmp=2, avg=1
@@ -186,7 +185,57 @@ Classical Quickselect
     n=6, j=4, cmp=6000, avg=25/3
     n=6, j=5, cmp=5112, avg=71/10
     True
+
+Dual-pivot Quickselect "Count"
+------------------------------
+
+::
+
+    sage: def comparisons_quickselect_dual(P):
+    ....:     @cached_function
+    ....:     def C(n, j):
+    ....:         if n <= 0 or j <= 0 or n < j:
+    ....:             return 0
+    ....:         return P(n) + (1 / binomial(n, 2) * \
+    ....:             (sum((n-1-s) * C(s, j)
+    ....:                  for s in srange(j, n-2+1)) +
+    ....:              sum(C(n-2-s-ell, j-(s+1))
+    ....:                  for s in srange(0, j-2+1)
+    ....:                  for ell in srange(0, n-j-1+1)) +
+    ....:              sum((n-1-ell) * C(ell, j-(n-ell))
+    ....:                  for ell in srange(n-j+1, n-2+1))
+    ....:             ) if n >= 2 else 0)
+    ....:     return C
+    sage: comparisons_quickselect_dual_count = comparisons_quickselect_dual(P_CT)
+
+    sage: all(QuickStar().avg_comparisons_quickselect(
+    ....:         n, j, 'partitioned_dual_count', verbose=True) ==
+    ....:     comparisons_quickselect_dual_count(n, j+1)
+    ....:     for n in srange(7) for j in srange(n))
+    n=1, j=0, cmp=0, avg=0
+    n=2, j=0, cmp=2, avg=1
+    n=2, j=1, cmp=2, avg=1
+    n=3, j=0, cmp=16, avg=8/3
+    n=3, j=1, cmp=16, avg=8/3
+    n=3, j=2, cmp=16, avg=8/3
+    n=4, j=0, cmp=106, avg=53/12
+    n=4, j=1, cmp=110, avg=55/12
+    n=4, j=2, cmp=110, avg=55/12
+    n=4, j=3, cmp=106, avg=53/12
+    n=5, j=0, cmp=754, avg=377/60
+    n=5, j=1, cmp=798, avg=133/20
+    n=5, j=2, cmp=818, avg=409/60
+    n=5, j=3, cmp=798, avg=133/20
+    n=5, j=4, cmp=754, avg=377/60
+    n=6, j=0, cmp=5916, avg=493/60
+    n=6, j=1, cmp=6312, avg=263/30
+    n=6, j=2, cmp=6564, avg=547/60
+    n=6, j=3, cmp=6564, avg=547/60
+    n=6, j=4, cmp=6312, avg=263/30
+    n=6, j=5, cmp=5916, avg=493/60
+    True
 """
+
 class QuickStar(object):
     r"""
 
