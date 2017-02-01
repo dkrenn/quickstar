@@ -629,14 +629,15 @@ class QuickStar(object):
 
 
     def partitioned_polytopes(self, L, polytopes):
-        d = polytopes[0].polytope.ambient_dim()
+        d = polytopes[0].polytope.ambient_dim() - 1
         iterL = iter(L)
 
-        pivots = sorted(next(iterL) for _ in range(d-1))  # TODO: costs
-        self.comparisons += 1     # TODO: costs
+        pivots = sorted(next(iterL) for _ in range(d))  # TODO: costs
+        if len(pivots) == d:
+            self.comparisons += 1     # TODO: costs
 
-        classified = tuple([] for _ in range(d))
-        counts = [0 for _ in range(d)]
+        classified = tuple([] for _ in range(d+1))
+        counts = [0 for _ in range(d+1)]
 
         for element in iterL:
             p = next(pp for pp in polytopes if pp.polytope.contains(counts))
