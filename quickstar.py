@@ -645,7 +645,7 @@ class QuickStar(object):
         iterL = iter(L)
 
         pivots = sorted(next(iterL) for _ in range(d))
-        self.comparisons += optimal_sorting_cost[d]
+        self.comparisons += optimal_sorting_cost[len(pivots)]
 
         classified = tuple([] for _ in range(d+1))
         counts = [0 for _ in range(d+1)]
