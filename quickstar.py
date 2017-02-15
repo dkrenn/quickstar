@@ -377,13 +377,15 @@ Dual-pivot Quickselect "p first"
     True
 """
 
+from sage.rings.integer_ring import ZZ
+
 optimal_sorting_cost = {
-    0: 0,
-    1: 0,
-    2: 1,
-    3: 8/3,    # 16/6
-    4: 14/3,   # 112/24
-    5: 104/15  # 832/120
+    0: ZZ(0),
+    1: ZZ(0),
+    2: ZZ(1),
+    3: ZZ(8)/ZZ(3),    # 16/6
+    4: ZZ(14)/ZZ(3),   # 112/24
+    5: ZZ(104)/ZZ(15)  # 832/120
 }
 
 
