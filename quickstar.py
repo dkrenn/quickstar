@@ -642,9 +642,8 @@ class QuickStar(object):
         d = polytopes[0].polytope.ambient_dim() - 1
         iterL = iter(L)
 
-        pivots = sorted(next(iterL) for _ in range(d))  # TODO: costs
-        if len(pivots) == d:
-            self.comparisons += 1     # TODO: costs
+        pivots = sorted(next(iterL) for _ in range(d))
+        self.comparisons += optimal_sorting_cost[d]
 
         classified = tuple([] for _ in range(d+1))
         counts = [0 for _ in range(d+1)]
