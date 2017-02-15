@@ -377,6 +377,16 @@ Dual-pivot Quickselect "p first"
     True
 """
 
+optimal_sorting_cost = {
+    0: 0,
+    1: 0,
+    2: 1,
+    3: 8/3,    # 16/6
+    4: 14/3,   # 112/24
+    5: 104/15  # 832/120
+}
+
+
 class QuickStar(object):
     r"""
 
