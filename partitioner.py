@@ -199,6 +199,8 @@ def strict_inequality_symmetric_choice(k, left, right):
         return sorted((((t-k).abs().ceil(), -t) for t in T))
     return distances_to_center(left) < distances_to_center(right)
 
+
+def get_polytopes(dimension, make_disjoint=False, verbose=True):
     r"""
     EXAMPLES::
 
@@ -250,6 +252,57 @@ def strict_inequality_symmetric_choice(k, left, right):
         b1 >= 0
         b3 >= b0 + b1 + 1
         b2 >= b0
+
+    TESTS::
+
+        sage: p2 = get_polytopes(2, make_disjoint=True)
+        *********************************
+        Partitioner 1 () (2 () ())
+        b2 >= 0
+        b1 >= 0
+        b0 >= b2
+        *********************************
+        Partitioner 2 (1 () ()) ()
+        b2 >= b0 + 1
+        b1 >= 0
+        b0 >= 0
+        sage: p3 = get_polytopes(3, make_disjoint=True)
+        *********************************
+        Partitioner 1 () (2 () (3 () ()))
+        b3 >= 0
+        b2 >= 0
+        b1 >= b3 + 1
+        b0 >= b2 + b3 + 1
+        *********************************
+        Partitioner 1 () (3 (2 () ()) ())
+        b3 >= b1
+        b2 >= 0
+        b1 >= 0
+        b0 >= b1 + b2 + 1
+        b0 >= b3
+        *********************************
+        Partitioner 2 (1 () ()) (3 () ())
+        b2 + b3 >= b0
+        b1 + b2 >= b0
+        b3 >= 0
+        b2 >= 0
+        b1 >= 0
+        b1 + b2 >= b3
+        b0 >= 0
+        b0 + b1 >= b3
+        *********************************
+        Partitioner 3 (1 () (2 () ())) ()
+        b3 >= b0 + 1
+        b3 >= b1 + b2 + 1
+        b2 >= 0
+        b1 >= 0
+        b0 >= b2
+        *********************************
+        Partitioner 3 (2 (1 () ()) ()) ()
+        b3 >= b0 + b1 + 1
+        b2 >= b0 + 1
+        b1 >= 0
+        b0 >= 0
     """
     from sage.geometry.polyhedron.constructor import Polyhedron
     from sage.symbolic.ring import SR
@@ -267,6 +320,9 @@ def strict_inequality_symmetric_choice(k, left, right):
         ineqs = [other.partition_cost() - this.partition_cost() for other in others] + vars
         ineq_matrix = [get_vector(ineq, vars) for ineq in ineqs]
         P = Polyhedron(ieqs=ineq_matrix)
+        if make_disjoint:
+            P = Polyhedron(ieqs=[break_tie(tuple(ieq))
+                                 for ieq in P.inequalities()])
         this.polytope = P
         if verbose:
             print("*********************************")
