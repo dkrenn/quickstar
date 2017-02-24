@@ -146,6 +146,59 @@ def get_partitioners(r):
             
 
 def get_polytopes(dimension, verbose=True):
+
+def break_tie(values):
+    r"""
+    EXAMPLES::
+
+        sage: for p in get_polytopes(2, verbose=False):
+        ....:     print(Polyhedron(
+        ....:         ieqs=[break_tie(tuple(ieq))
+        ....:               for ieq in p.polytope.inequalities()]).repr_pretty_Hrepresentation())
+        x2 >= 0, x1 >= 0, x0 >= x2
+        x2 >= x0 + 1, x1 >= 0, x0 >= 0
+        sage: for p in get_polytopes(3, verbose=False):
+        ....:     print(Polyhedron(
+        ....:         ieqs=[break_tie(tuple(ieq))
+        ....:               for ieq in p.polytope.inequalities()]).repr_pretty_Hrepresentation())
+        x3 >= 0, x2 >= 0, x1 >= x3 + 1, x0 >= x2 + x3 + 1
+        x3 >= x1, x2 >= 0, x1 >= 0, x0 >= x1 + x2 + 1, x0 >= x3
+        x2 + x3 >= x0, x1 + x2 >= x0, x3 >= 0, x2 >= 0, x1 >= 0, x1 + x2 >= x3, x0 >= 0, x0 + x1 >= x3
+        x3 >= x0 + 1, x3 >= x1 + x2 + 1, x2 >= 0, x1 >= 0, x0 >= x2
+        x3 >= x0 + x1 + 1, x2 >= x0 + 1, x1 >= 0, x0 >= 0
+    """
+    nc_values = values[1:]
+    k = len(nc_values)
+    left = tuple(i for i, t in enumerate(nc_values) if t > 0)
+    right = tuple(i for i, t in enumerate(nc_values) if t < 0)
+    if strict_inequality_symmetric_choice(k, left, right):
+        den = lcm([QQ(t).denominator() for t in nc_values])
+        return (values[0] - den,) + tuple(nc_values)
+    else:
+        return tuple(values)
+
+
+def strict_inequality_symmetric_choice(k, left, right):
+    r"""
+    TESTS::
+
+        sage: S = Set(srange(5))
+        sage: for s in S.subsets():
+        ....:     L = tuple(s)
+        ....:     R = tuple(S.difference(s))
+        ....:     a = strict_inequality_symmetric_choice(5, L, R)
+        ....:     b = strict_inequality_symmetric_choice(5, R, L)
+        ....:     assert a != b
+
+        sage: strict_inequality_symmetric_choice(1, [], [0])
+        True
+    """
+    assert not set(left) & set(right)
+    k = QQ(k - 1) / QQ(2)
+    def distances_to_center(T):
+        return sorted((((t-k).abs().ceil(), -t) for t in T))
+    return distances_to_center(left) < distances_to_center(right)
+
     r"""
     EXAMPLES::
 
