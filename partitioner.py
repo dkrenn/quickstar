@@ -328,4 +328,13 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
             print("*********************************")
             print("Partitioner {}".format(this))
             print(this.repr_pretty_polytope())
+
+    dim = partitioners[0].polytope.ambient_dim()
+    nonnegative_orthant = Polyhedron(ieqs=[dd*(0,) + (1,) + (dim-dd)*(0,)
+                                           for dd in range(1, dim+1)])
+    assert all(A.polytope & nonnegative_orthant == A.polytope
+               for A in partitioners)
+    if make_disjoint:
+        assert all((A.polytope & B.polytope).is_empty()
+                   for A in partitioners for B in partitioners if A != B)
     return partitioners
