@@ -143,9 +143,7 @@ def get_partitioners(r):
         for left in get_partitioners(r[:i]):
             for right in get_partitioners(r[i+1:]):
                 yield Partitioner(top, left, right)
-            
 
-def get_polytopes(dimension, verbose=True):
 
 def break_tie(values):
     r"""
