@@ -198,6 +198,11 @@ def strict_inequality_symmetric_choice(k, left, right):
     return distances_to_center(left) < distances_to_center(right)
 
 
+def polyhedron_break_tie(polyhedron):
+    return Polyhedron(ieqs=[break_tie(tuple(ieq))
+                            for ieq in polyhedron.inequalities()])
+
+
 def get_polytopes(dimension, make_disjoint=False, verbose=True):
     r"""
     EXAMPLES::
@@ -319,8 +324,7 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
         ineq_matrix = [get_vector(ineq, vars) for ineq in ineqs]
         P = Polyhedron(ieqs=ineq_matrix)
         if make_disjoint:
-            P = Polyhedron(ieqs=[break_tie(tuple(ieq))
-                                 for ieq in P.inequalities()])
+            P = polyhedron_break_tie(P)
         this.polytope = P
         if verbose:
             print("*********************************")
