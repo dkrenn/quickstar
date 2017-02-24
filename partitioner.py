@@ -83,8 +83,10 @@ class Partitioner(SageObject):
             print(repr_pretty(coeffs, 0, indices=self._indices_(), prefix='b'))
 
 
-    def repr_pretty_polytope(self):
-        return self.polytope.repr_pretty_Hrepresentation(
+    def repr_pretty_polytope(self, strict_inequality=False):
+        return repr_pretty_Hrepresentation(
+            self.polytope,
+            strict_inequality=strict_inequality,
             indices=self._indices_(), prefix='b', separator='\n')
 
 
@@ -145,7 +147,7 @@ def get_partitioners(r):
                 yield Partitioner(top, left, right)
 
 
-def break_tie(values):
+def break_tie(values, undo=False):
     r"""
     EXAMPLES::
 
@@ -165,15 +167,26 @@ def break_tie(values):
         x3 >= x0 + 1, x3 >= x1 + x2 + 1, x2 >= 0, x1 >= 0, x0 >= x2
         x3 >= x0 + x1 + 1, x2 >= x0 + 1, x1 >= 0, x0 >= 0
     """
+    if _is_strict_(values):
+        return _make_strict_(values, undo=undo)
+    else:
+        return tuple(values)
+
+
+def _is_strict_(values):
     nc_values = values[1:]
     k = len(nc_values)
     left = tuple(i for i, t in enumerate(nc_values) if t > 0)
     right = tuple(i for i, t in enumerate(nc_values) if t < 0)
-    if strict_inequality_symmetric_choice(k, left, right):
-        den = lcm([QQ(t).denominator() for t in nc_values])
-        return (values[0] - den,) + tuple(nc_values)
-    else:
-        return tuple(values)
+    return strict_inequality_symmetric_choice(k, left, right)
+
+
+def _make_strict_(values, undo=False):
+    nc_values = values[1:]
+    den = lcm([QQ(t).denominator() for t in nc_values])
+    if undo:
+        den = -den
+    return (values[0] - den,) + tuple(nc_values)
 
 
 def strict_inequality_symmetric_choice(k, left, right):
@@ -198,9 +211,28 @@ def strict_inequality_symmetric_choice(k, left, right):
     return distances_to_center(left) < distances_to_center(right)
 
 
-def polyhedron_break_tie(polyhedron):
-    return Polyhedron(ieqs=[break_tie(tuple(ieq))
+def polyhedron_break_tie(polyhedron, undo=False):
+    if polyhedron.equations():
+        raise NotImplementedError
+    return Polyhedron(ieqs=[break_tie(tuple(ieq), undo=undo)
                             for ieq in polyhedron.inequalities()])
+
+
+def repr_pretty_Hrepresentation(self, separator=', ',
+                                strict_inequality=False,
+                                **kwds):
+    if not strict_inequality:
+        return self.repr_pretty_Hrepresentation(separator=separator,
+                                                **kwds)
+
+    P = polyhedron_break_tie(self, undo=True)
+    def repr_ieq(ieq):
+        rp = ieq.repr_pretty(**kwds)
+        if _is_strict_(tuple(ieq)):
+            rp = rp.replace('>=', '>')
+        return rp
+
+    return separator.join(repr_ieq(h) for h in P.Hrepresentation())
 
 
 def get_polytopes(dimension, make_disjoint=False, verbose=True):
@@ -218,6 +250,7 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
         b2 >= b0
         b0 >= 0
         b1 >= 0
+
         sage: p3 = get_polytopes(3)
         *********************************
         Partitioner 1 () (2 () (3 () ()))
@@ -266,15 +299,16 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
         b0 >= b2
         *********************************
         Partitioner 2 (1 () ()) ()
-        b2 >= b0 + 1
+        b2 > b0
         b1 >= 0
         b0 >= 0
+
         sage: p3 = get_polytopes(3, make_disjoint=True)
         *********************************
         Partitioner 1 () (2 () (3 () ()))
         b3 >= 0
         b2 >= 0
-        b1 >= b3 + 1
+        b1 > b3
         b0 >= b2 + b3 + 1
         *********************************
         Partitioner 1 () (3 (2 () ()) ())
@@ -285,17 +319,17 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
         b0 >= b3
         *********************************
         Partitioner 2 (1 () ()) (3 () ())
-        b2 + b3 >= b0
-        b1 + b2 >= b0
+        b2 + b3 + 1 > b0
+        b1 + b2 + 1 > b0
         b3 >= 0
         b2 >= 0
         b1 >= 0
-        b1 + b2 >= b3
+        b1 + b2 + 1 > b3
         b0 >= 0
-        b0 + b1 >= b3
+        b0 + b1 + 1 > b3
         *********************************
         Partitioner 3 (1 () (2 () ())) ()
-        b3 >= b0 + 1
+        b3 > b0
         b3 >= b1 + b2 + 1
         b2 >= 0
         b1 >= 0
@@ -303,7 +337,7 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
         *********************************
         Partitioner 3 (2 (1 () ()) ()) ()
         b3 >= b0 + b1 + 1
-        b2 >= b0 + 1
+        b2 > b0
         b1 >= 0
         b0 >= 0
     """
@@ -329,7 +363,7 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
         if verbose:
             print("*********************************")
             print("Partitioner {}".format(this))
-            print(this.repr_pretty_polytope())
+            print(this.repr_pretty_polytope(strict_inequality=make_disjoint))
 
     dim = partitioners[0].polytope.ambient_dim()
     nonnegative_orthant = Polyhedron(ieqs=[dd*(0,) + (1,) + (dim-dd)*(0,)
