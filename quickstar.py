@@ -666,6 +666,32 @@ class QuickStar(object):
             sum(zip(([p] for p in pivots), classified[1:]), tuple())
 
 
+    def partitioned_trees(self, L, trees):
+        from sage.modules.free_module_element import vector
+        from six import itervalues
+
+        indices = trees[0]._indices_()
+        d = len(indices) - 1
+        iterL = iter(L)
+
+        pivots = sorted(next(iterL) for _ in range(d))
+        self.comparisons += optimal_sorting_cost[len(pivots)]
+
+        classified = tuple([] for _ in range(d+1))
+        H = {i: vector(T.height(i) for T in trees) for i in indices}
+        rhs = sum(h for h in itervalues(H))
+
+        for element in iterL:
+            T = trees[min_with_index(rhs)[0]]
+            classification, comparisons = T.classify_element(element, pivots)
+            self.comparisons += comparisons
+            classified[classification].append(element)
+            rhs += H[classification]
+
+        return (classified[0],) + \
+            sum(zip(([p] for p in pivots), classified[1:]), tuple())
+
+
     def quicksorted(self, L, partitioning_strategy='partitioned_classic',
                     **kwds):
         partitioned = getattr(self, partitioning_strategy)
