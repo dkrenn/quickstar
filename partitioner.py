@@ -163,11 +163,11 @@ def break_tie(values, undo=False):
         ....:     print(Polyhedron(
         ....:         ieqs=[break_tie(tuple(ieq))
         ....:               for ieq in p.polytope.inequalities()]).repr_pretty_Hrepresentation())
-        x3 >= 0, x2 >= 0, x1 >= x3 + 1, x0 >= x2 + x3 + 1
-        x3 >= x1, x2 >= 0, x1 >= 0, x0 >= x1 + x2 + 1, x0 >= x3
-        x2 + x3 >= x0, x1 + x2 >= x0, x3 >= 0, x2 >= 0, x1 >= 0, x1 + x2 >= x3, x0 >= 0, x0 + x1 >= x3
-        x3 >= x0 + 1, x3 >= x1 + x2 + 1, x2 >= 0, x1 >= 0, x0 >= x2
-        x3 >= x0 + x1 + 1, x2 >= x0 + 1, x1 >= 0, x0 >= 0
+        x3 >= 0, x2 >= 0, x1 >= x3, x0 >= x2 + x3 + 2
+        x3 >= x1 + 1, x2 >= 0, x1 >= 0, x0 >= x1 + x2 + 2, x0 >= x3
+        x2 + x3 + 1 >= x0, x1 + x2 + 1 >= x0, x3 >= 0, x2 >= 0, x1 >= 0, x1 + x2 + 1 >= x3, x0 >= 0, x0 + x1 + 1 >= x3
+        x3 >= x0 + 1, x3 >= x1 + x2 + 2, x2 >= 0, x1 >= 0, x0 >= x2 + 1
+        x3 >= x0 + x1 + 2, x2 >= x0, x1 >= 0, x0 >= 0
     """
     if _is_strict_(values):
         return _make_strict_(values, undo=undo)
@@ -207,10 +207,14 @@ def strict_inequality_symmetric_choice(k, left, right):
         True
     """
     assert not set(left) & set(right)
-    k = QQ(k - 1) / QQ(2)
-    def distances_to_center(T):
-        return sorted((((t-k).abs().ceil(), -t) for t in T))
-    return distances_to_center(left) < distances_to_center(right)
+    center = QQ(k - 1) / QQ(2)
+    def weight(t):
+        return -(center + 1 - (t-center).abs())
+    def total(T):
+        return sum(weight(t) for t in T)
+    def rule(T):
+        return total(T), sorted((weight(t), t) for t in T)
+    return rule(left) > rule(right)
 
 
 def polyhedron_break_tie(polyhedron, undo=False):
@@ -310,36 +314,36 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
         Partitioner 1 () (2 () (3 () ()))
         s3 >= 0
         s2 >= 0
-        s1 > s3
-        s0 >= s2 + s3 + 1
+        s1 >= s3
+        s0 > s2 + s3 + 1
         *********************************
         Partitioner 1 () (3 (2 () ()) ())
-        s3 >= s1
+        s3 > s1
         s2 >= 0
         s1 >= 0
-        s0 >= s1 + s2 + 1
+        s0 > s1 + s2 + 1
         s0 >= s3
         *********************************
         Partitioner 2 (1 () ()) (3 () ())
-        s2 + s3 + 1 > s0
-        s1 + s2 + 1 > s0
+        s2 + s3 + 1 >= s0
+        s1 + s2 + 1 >= s0
         s3 >= 0
         s2 >= 0
         s1 >= 0
-        s1 + s2 + 1 > s3
+        s1 + s2 + 1 >= s3
         s0 >= 0
-        s0 + s1 + 1 > s3
+        s0 + s1 + 1 >= s3
         *********************************
         Partitioner 3 (1 () (2 () ())) ()
         s3 > s0
-        s3 >= s1 + s2 + 1
+        s3 > s1 + s2 + 1
         s2 >= 0
         s1 >= 0
-        s0 >= s2
+        s0 > s2
         *********************************
         Partitioner 3 (2 (1 () ()) ()) ()
-        s3 >= s0 + s1 + 1
-        s2 > s0
+        s3 > s0 + s1 + 1
+        s2 >= s0
         s1 >= 0
         s0 >= 0
     """
