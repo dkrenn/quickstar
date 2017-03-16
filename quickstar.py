@@ -389,6 +389,11 @@ optimal_sorting_cost = {
 }
 
 
+def min_with_index(values):
+    import operator
+    return min(enumerate(values), key=operator.itemgetter(1))
+
+
 class QuickStar(object):
     r"""
 
