@@ -243,12 +243,40 @@ def split_polyhedra(dim):
         s2 > s1, s0 >= s2
         s1 >= s0, s0 >= s2
         s1 >= s2, s0 > s1
+
+        sage: for P in split_polyhedra(4):
+        ....:     print(repr_pretty_Hrepresentation(P, strict_inequality=True,
+        ....:                                       prefix='s'))
+        s1 >= s0, s2 > s1, s3 > s2
+        s1 >= s0, s3 > s1, s2 >= s3
+        s2 >= s0, s3 > s1, s1 >= s2
+        s2 >= s0, s3 > s2, s1 >= s3
+        s3 > s0, s2 > s1, s1 >= s3
+        s3 > s0, s2 >= s3, s1 >= s2
+        s2 >= s0, s3 > s2, s0 > s1
+        s3 > s0, s2 >= s3, s0 > s1
+        s3 > s0, s2 > s1, s0 > s2
+        s2 > s1, s3 > s2, s0 >= s3
+        s2 >= s0, s3 > s1, s0 >= s3
+        s3 > s1, s2 >= s3, s0 > s2
+        s1 >= s0, s3 > s1, s0 > s2
+        s3 > s0, s1 >= s3, s0 > s2
+        s3 > s0, s1 >= s2, s0 > s1
+        s3 > s1, s1 >= s2, s0 >= s3
+        s1 >= s0, s3 > s2, s0 >= s3
+        s3 > s2, s1 >= s3, s0 > s1
+        s1 >= s0, s2 > s1, s0 >= s3
+        s2 >= s0, s1 >= s2, s0 >= s3
+        s2 >= s0, s1 >= s3, s0 > s1
+        s2 > s1, s1 >= s3, s0 > s2
+        s1 >= s0, s2 >= s3, s0 > s2
+        s2 >= s3, s1 >= s2, s0 > s1
     """
     return iter(
         polyhedron_break_tie(
             Polyhedron(
                 ieqs=[tuple(1 if i==b else (-1 if i==a else 0)
-                            for i in range(d+1))
+                            for i in range(dim+1))
                       for a, b in zip(pi[:-1], pi[1:])]))
         for pi in Permutations(dim))
 
