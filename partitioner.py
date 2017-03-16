@@ -7,6 +7,8 @@ from sage.structure.sage_object import SageObject
 
 class Partitioner(SageObject):
 
+    PREFIX = 's'
+
     def __init__(self, top, left, right):
         self.top = top
         elements = []
@@ -80,14 +82,14 @@ class Partitioner(SageObject):
     def pretty_inequalities(self):
         from sage.geometry.polyhedron.representation import repr_pretty
         for coeffs in self._coefficients_inequalities_():
-            print(repr_pretty(coeffs, 0, indices=self._indices_(), prefix='b'))
+            print(repr_pretty(coeffs, 0, indices=self._indices_(), prefix=self.PREFIX))
 
 
     def repr_pretty_polytope(self, strict_inequality=False):
         return repr_pretty_Hrepresentation(
             self.polytope,
             strict_inequality=strict_inequality,
-            indices=self._indices_(), prefix='b', separator='\n')
+            indices=self._indices_(), prefix=self.PREFIX, separator='\n')
 
 
     def generating_function(self):
@@ -97,7 +99,7 @@ class Partitioner(SageObject):
     @cached_method        
     def partition_cost(self):
         from sage.symbolic.ring import SR
-        return sum(self.height(i) * (SR("b{}".format(i)) + 1)
+        return sum(self.height(i) * (SR(self.PREFIX + "{}".format(i)) + 1)
                   for i in range(self.minimum - 1, self.maximum + 1))
     
 
@@ -242,104 +244,104 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
         sage: p2 = get_polytopes(2)
         *********************************
         Partitioner 1 () (2 () ())
-        b2 >= 0
-        b1 >= 0
-        b0 >= b2
+        s2 >= 0
+        s1 >= 0
+        s0 >= s2
         *********************************
         Partitioner 2 (1 () ()) ()
-        b2 >= b0
-        b0 >= 0
-        b1 >= 0
+        s2 >= s0
+        s0 >= 0
+        s1 >= 0
 
         sage: p3 = get_polytopes(3)
         *********************************
         Partitioner 1 () (2 () (3 () ()))
-        b3 >= 0
-        b2 >= 0
-        b1 >= b3
-        b0 >= b2 + b3 + 1
+        s3 >= 0
+        s2 >= 0
+        s1 >= s3
+        s0 >= s2 + s3 + 1
         *********************************
         Partitioner 1 () (3 (2 () ()) ())
-        b3 >= b1
-        b0 >= b3
-        b2 >= 0
-        b1 >= 0
-        b0 >= b1 + b2 + 1
+        s3 >= s1
+        s0 >= s3
+        s2 >= 0
+        s1 >= 0
+        s0 >= s1 + s2 + 1
         *********************************
         Partitioner 2 (1 () ()) (3 () ())
-        b2 + b3 + 1 >= b0
-        b1 + b2 + 1 >= b0
-        b3 >= 0
-        b2 >= 0
-        b1 >= 0
-        b1 + b2 + 1 >= b3
-        b0 >= 0
-        b0 + b1 + 1 >= b3
+        s2 + s3 + 1 >= s0
+        s1 + s2 + 1 >= s0
+        s3 >= 0
+        s2 >= 0
+        s1 >= 0
+        s1 + s2 + 1 >= s3
+        s0 >= 0
+        s0 + s1 + 1 >= s3
         *********************************
         Partitioner 3 (1 () (2 () ())) ()
-        b0 >= b2
-        b3 >= b0
-        b3 >= b1 + b2 + 1
-        b1 >= 0
-        b2 >= 0
+        s0 >= s2
+        s3 >= s0
+        s3 >= s1 + s2 + 1
+        s1 >= 0
+        s2 >= 0
         *********************************
         Partitioner 3 (2 (1 () ()) ()) ()
-        b0 >= 0
-        b1 >= 0
-        b3 >= b0 + b1 + 1
-        b2 >= b0
+        s0 >= 0
+        s1 >= 0
+        s3 >= s0 + s1 + 1
+        s2 >= s0
 
     TESTS::
 
         sage: p2 = get_polytopes(2, make_disjoint=True)
         *********************************
         Partitioner 1 () (2 () ())
-        b2 >= 0
-        b1 >= 0
-        b0 >= b2
+        s2 >= 0
+        s1 >= 0
+        s0 >= s2
         *********************************
         Partitioner 2 (1 () ()) ()
-        b2 > b0
-        b1 >= 0
-        b0 >= 0
+        s2 > s0
+        s1 >= 0
+        s0 >= 0
 
         sage: p3 = get_polytopes(3, make_disjoint=True)
         *********************************
         Partitioner 1 () (2 () (3 () ()))
-        b3 >= 0
-        b2 >= 0
-        b1 > b3
-        b0 >= b2 + b3 + 1
+        s3 >= 0
+        s2 >= 0
+        s1 > s3
+        s0 >= s2 + s3 + 1
         *********************************
         Partitioner 1 () (3 (2 () ()) ())
-        b3 >= b1
-        b2 >= 0
-        b1 >= 0
-        b0 >= b1 + b2 + 1
-        b0 >= b3
+        s3 >= s1
+        s2 >= 0
+        s1 >= 0
+        s0 >= s1 + s2 + 1
+        s0 >= s3
         *********************************
         Partitioner 2 (1 () ()) (3 () ())
-        b2 + b3 + 1 > b0
-        b1 + b2 + 1 > b0
-        b3 >= 0
-        b2 >= 0
-        b1 >= 0
-        b1 + b2 + 1 > b3
-        b0 >= 0
-        b0 + b1 + 1 > b3
+        s2 + s3 + 1 > s0
+        s1 + s2 + 1 > s0
+        s3 >= 0
+        s2 >= 0
+        s1 >= 0
+        s1 + s2 + 1 > s3
+        s0 >= 0
+        s0 + s1 + 1 > s3
         *********************************
         Partitioner 3 (1 () (2 () ())) ()
-        b3 > b0
-        b3 >= b1 + b2 + 1
-        b2 >= 0
-        b1 >= 0
-        b0 >= b2
+        s3 > s0
+        s3 >= s1 + s2 + 1
+        s2 >= 0
+        s1 >= 0
+        s0 >= s2
         *********************************
         Partitioner 3 (2 (1 () ()) ()) ()
-        b3 >= b0 + b1 + 1
-        b2 > b0
-        b1 >= 0
-        b0 >= 0
+        s3 >= s0 + s1 + 1
+        s2 > s0
+        s1 >= 0
+        s0 >= 0
     """
     from sage.geometry.polyhedron.constructor import Polyhedron
     from sage.symbolic.ring import SR
@@ -350,7 +352,8 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
         return [constant] + coefficients
     
     partitioners = list(p for p in get_partitioners(range(1, dimension + 1)))
-    vars = list(SR("b{}".format(j)) for j in range(dimension+1))
+    prefix = partitioners[0].PREFIX
+    vars = list(SR(prefix + "{}".format(j)) for j in range(dimension+1))
     for this in partitioners:
         others = list(partitioners)
         others.remove(this)
