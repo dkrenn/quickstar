@@ -298,6 +298,16 @@ def repr_pretty_Hrepresentation(self, separator=', ',
     return separator.join(repr_ieq(h) for h in P.Hrepresentation())
 
 
+class ClassificationStrategy(tuple):
+    def __repr__(self):
+        return '\n'.join(
+            '*********************************' + '\n' +
+            'classification tree {}'.format(tree) + '\n' +
+            tree.repr_pretty_polyhedron(
+                strict_inequality=self._disjoint_)
+            for tree in self)
+
+
 def classification_strategy(dimension,
                             make_disjoint=False,
                             verbose=True,
@@ -417,12 +427,13 @@ def classification_strategy(dimension,
     
     if trees is None:
         trees = iter(p for p in classification_trees(range(1, dimension + 1)))
-    trees = list(trees)
+    strategy = ClassificationStrategy(trees)
+    strategy._disjoint_ = make_disjoint
 
-    prefix = trees[0].PREFIX
+    prefix = strategy[0].PREFIX
     vars = list(SR(prefix + "{}".format(j)) for j in range(dimension+1))
-    for this in trees:
-        others = list(trees)
+    for this in strategy:
+        others = list(strategy)
         others.remove(this)
         ineqs = [other.partition_cost() - this.partition_cost() for other in others] + vars
         ineq_matrix = [get_vector(ineq, vars) for ineq in ineqs]
@@ -430,17 +441,15 @@ def classification_strategy(dimension,
         if make_disjoint:
             P = polyhedron_break_tie(P)
         this.polyhedron = P
-        if verbose:
-            print("*********************************")
-            print("classification tree {}".format(this))
-            print(this.repr_pretty_polyhedron(strict_inequality=make_disjoint))
 
-    dim = trees[0].polyhedron.ambient_dim()
+    dim = strategy[0].polyhedron.ambient_dim()
     nonnegative_orthant = Polyhedron(ieqs=[dd*(0,) + (1,) + (dim-dd)*(0,)
                                            for dd in range(1, dim+1)])
     assert all(A.polyhedron & nonnegative_orthant == A.polyhedron
-               for A in trees)
+               for A in strategy)
     if make_disjoint:
         assert all((A.polyhedron & B.polyhedron).is_empty()
-                   for A in trees for B in trees if A != B)
-    return trees
+                   for A in strategy for B in strategy if A != B)
+    if verbose:
+        print(repr(strategy))
+    return strategy
