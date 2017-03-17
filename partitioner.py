@@ -328,9 +328,10 @@ class ClassificationStrategy(tuple):
         return self[0].indices()
 
     def d(self):
+        from sage.rings.integer_ring import ZZ
         d = len(self.indices()) - 1
         assert d == self[0].polyhedron.ambient_dim() - 1
-        return d
+        return ZZ(d)
 
     def H(self):
         from sage.modules.free_module_element import vector
