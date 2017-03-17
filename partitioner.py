@@ -343,6 +343,12 @@ class ClassificationStrategy(tuple):
         return next(tree for tree in self
                     if tree.polyhedron.contains(counts))
 
+    def nonempty_subsets(self):
+        from sage.misc.misc import subsets
+        return iter(new_ClassificationStrategy(s, disjoint=self._disjoint_)
+                    for s in subsets(self)
+                    if s)
+
 
 def classification_strategy(dimension,
                             make_disjoint=False,
