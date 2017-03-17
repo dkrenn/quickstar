@@ -315,7 +315,14 @@ def repr_pretty_Hrepresentation(self, separator=', ',
     return separator.join(repr_ieq(h) for h in P.Hrepresentation())
 
 
+def new_ClassificationStrategy(arg, disjoint=False):
+    cs = ClassificationStrategy(arg)
+    cs._disjoint_ = disjoint
+    return cs
+
+
 class ClassificationStrategy(tuple):
+
     def __repr__(self):
         return '\n'.join(
             '*********************************' + '\n' +
@@ -471,8 +478,7 @@ def classification_strategy(dimension,
     
     if trees is None:
         trees = iter(p for p in classification_trees(range(1, dimension + 1)))
-    strategy = ClassificationStrategy(trees)
-    strategy._disjoint_ = make_disjoint
+    strategy = new_ClassificationStrategy(trees, disjoint=make_disjoint)
 
     prefix = strategy[0].PREFIX
     vars = list(SR(prefix + "{}".format(j)) for j in range(dimension+1))
