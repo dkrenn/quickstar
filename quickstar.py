@@ -646,7 +646,7 @@ class QuickStar(object):
         return small, pivot, medium, qivot, large
 
 
-    def partitioned_polytopes(self, L, strategy):
+    def partitioned_polyhedra(self, L, strategy):
         d = strategy.d()
         iterL = iter(L)
 
