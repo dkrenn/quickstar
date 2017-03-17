@@ -307,6 +307,23 @@ class ClassificationStrategy(tuple):
                 strict_inequality=self._disjoint_)
             for tree in self)
 
+    def indices(self):
+        return self[0].indices()
+
+    def d(self):
+        d = len(self.indices()) - 1
+        assert d == self[0].polyhedron.ambient_dim() - 1
+        return d
+
+    def H(self):
+        from sage.modules.free_module_element import vector
+        return {i: vector(tree.height(i) for tree in self)
+                for i in self.indices()}
+
+    def next_classification_tree_by_counts(self, counts):
+        return next(tree for tree in self
+                    if tree.polyhedron.contains(counts))
+
 
 def classification_strategy(dimension,
                             make_disjoint=False,

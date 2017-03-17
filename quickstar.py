@@ -377,6 +377,7 @@ Dual-pivot Quickselect "p first"
     True
 """
 
+from six import itervalues
 from sage.rings.integer_ring import ZZ
 
 optimal_sorting_cost = {
@@ -645,8 +646,8 @@ class QuickStar(object):
         return small, pivot, medium, qivot, large
 
 
-    def partitioned_polytopes(self, L, polytopes):
-        d = polytopes[0].polytope.ambient_dim() - 1
+    def partitioned_polytopes(self, L, strategy):
+        d = strategy.d()
         iterL = iter(L)
 
         pivots = sorted(next(iterL) for _ in range(d))
@@ -656,8 +657,8 @@ class QuickStar(object):
         counts = [0 for _ in range(d+1)]
 
         for element in iterL:
-            p = next(pp for pp in polytopes if pp.polytope.contains(counts))
-            classification, comparisons = p.classify_element(element, pivots)
+            tree = strategy.next_classification_tree_by_counts(counts)
+            classification, comparisons = tree.classify_element(element, pivots)
             self.comparisons += comparisons
             classified[classification].append(element)
             counts[classification] += 1
@@ -666,24 +667,20 @@ class QuickStar(object):
             sum(zip(([p] for p in pivots), classified[1:]), tuple())
 
 
-    def partitioned_trees(self, L, trees):
-        from sage.modules.free_module_element import vector
-        from six import itervalues
-
-        indices = trees[0]._indices_()
-        d = len(indices) - 1
+    def partitioned_trees(self, L, strategy):
+        d = strategy.d()
         iterL = iter(L)
 
         pivots = sorted(next(iterL) for _ in range(d))
         self.comparisons += optimal_sorting_cost[len(pivots)]
 
         classified = tuple([] for _ in range(d+1))
-        H = {i: vector(T.height(i) for T in trees) for i in indices}
+        H = strategy.H()
         rhs = sum(h for h in itervalues(H))
 
         for element in iterL:
-            T = trees[min_with_index(rhs)[0]]
-            classification, comparisons = T.classify_element(element, pivots)
+            tree = trees[min_with_index(rhs)[0]]
+            classification, comparisons = tree.classify_element(element, pivots)
             self.comparisons += comparisons
             classified[classification].append(element)
             rhs += H[classification]
