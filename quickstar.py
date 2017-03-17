@@ -679,7 +679,7 @@ class QuickStar(object):
         rhs = sum(h for h in itervalues(H))
 
         for element in iterL:
-            tree = trees[min_with_index(rhs)[0]]
+            tree = strategy[min_with_index(rhs)[0]]
             classification, comparisons = tree.classify_element(element, pivots)
             self.comparisons += comparisons
             classified[classification].append(element)
