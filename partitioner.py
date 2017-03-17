@@ -107,6 +107,8 @@ class ClassificationTree(SageObject):
         r"""
         EXAMPLES::
 
+            sage: from partitioner import classification_strategy
+
             sage: p = classification_strategy(2, verbose=False)[0]
             sage: p.classify_element(5, [10, 20])
             (0, 1)
@@ -153,6 +155,8 @@ def break_tie(values, undo=False):
     r"""
     EXAMPLES::
 
+        sage: from partitioner import classification_strategy, break_tie
+
         sage: for p in classification_strategy(2, verbose=False):
         ....:     print(Polyhedron(
         ....:         ieqs=[break_tie(tuple(ieq))
@@ -184,6 +188,9 @@ def _is_strict_(values):
 
 
 def _make_strict_(values, undo=False):
+    from sage.arith.misc import lcm
+    from sage.rings.rational_field import QQ
+
     nc_values = values[1:]
     den = lcm([QQ(t).denominator() for t in nc_values])
     if undo:
@@ -195,6 +202,7 @@ def strict_inequality_symmetric_choice(k, left, right):
     r"""
     TESTS::
 
+        sage: from partitioner import strict_inequality_symmetric_choice
         sage: S = Set(srange(5))
         sage: for s in S.subsets():
         ....:     L = tuple(s)
@@ -206,6 +214,8 @@ def strict_inequality_symmetric_choice(k, left, right):
         sage: strict_inequality_symmetric_choice(1, [], [0])
         True
     """
+    from sage.rings.rational_field import QQ
+
     assert not set(left) & set(right)
     center = QQ(k - 1) / QQ(2)
     def weight(t):
@@ -218,6 +228,8 @@ def strict_inequality_symmetric_choice(k, left, right):
 
 
 def polyhedron_break_tie(polyhedron, undo=False):
+    from sage.geometry.polyhedron.constructor import Polyhedron
+
     if polyhedron.equations():
         raise NotImplementedError
     return Polyhedron(ieqs=[break_tie(tuple(ieq), undo=undo)
@@ -227,6 +239,8 @@ def polyhedron_break_tie(polyhedron, undo=False):
 def split_polyhedra(dim):
     r"""
     ::
+
+        sage: from partitioner import split_polyhedra, repr_pretty_Hrepresentation
 
         sage: for P in split_polyhedra(2):
         ....:     print(repr_pretty_Hrepresentation(P, strict_inequality=True,
@@ -272,6 +286,9 @@ def split_polyhedra(dim):
         s1 >= s0, s2 >= s3, s0 > s2
         s2 >= s3, s1 >= s2, s0 > s1
     """
+    from sage.combinat.permutation import Permutations
+    from sage.geometry.polyhedron.constructor import Polyhedron
+
     return iter(
         polyhedron_break_tie(
             Polyhedron(
@@ -331,6 +348,8 @@ def classification_strategy(dimension,
                             trees=None):
     r"""
     EXAMPLES::
+
+        sage: from partitioner import classification_strategy
 
         sage: p2 = classification_strategy(2)
         *********************************
