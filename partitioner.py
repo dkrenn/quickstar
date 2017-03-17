@@ -325,6 +325,7 @@ class ClassificationStrategy(tuple):
             for tree in self)
 
     def indices(self):
+        assert len(set(tree.indices() for tree in self)) <= 1
         return self[0].indices()
 
     def d(self):
