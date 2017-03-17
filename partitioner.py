@@ -5,7 +5,7 @@ from sage.misc.cachefunc import cached_method
 from sage.structure.sage_object import SageObject
 
 
-class Partitioner(SageObject):
+class ClassificationTree(SageObject):
 
     PREFIX = 's'
 
@@ -23,7 +23,7 @@ class Partitioner(SageObject):
             raise ValueError("elements {} do not form a consecutive range")
         self.left = left
         self.right = right
-        self.polytope = None
+        self.polyhedron = None
 
 
     def __iter__(self):
@@ -64,32 +64,32 @@ class Partitioner(SageObject):
                 return 1 + self.right.height(i)
 
 
-    def set_polytope(self, polytope):
-        self.polytope = polytope
+    def set_polyhedron(self, polyhedron):
+        self.polyhedron = polyhedron
         
 
     def _coefficients_inequalities_(self):
-        for i in self.polytope.Hrepresentation():
+        for i in self.polyhedron.Hrepresentation():
             if not i.is_inequality():
                 raise NotImplementedError("{} is not an inequality".format(i))
             yield tuple(i.vector())
 
 
-    def _indices_(self):
+    def indices(self):
         return tuple(range(self.minimum - 1, self.maximum + 1))
 
 
     def pretty_inequalities(self):
         from sage.geometry.polyhedron.representation import repr_pretty
         for coeffs in self._coefficients_inequalities_():
-            print(repr_pretty(coeffs, 0, indices=self._indices_(), prefix=self.PREFIX))
+            print(repr_pretty(coeffs, 0, indices=self.indices(), prefix=self.PREFIX))
 
 
-    def repr_pretty_polytope(self, strict_inequality=False):
+    def repr_pretty_polyhedron(self, strict_inequality=False):
         return repr_pretty_Hrepresentation(
-            self.polytope,
+            self.polyhedron,
             strict_inequality=strict_inequality,
-            indices=self._indices_(), prefix=self.PREFIX, separator='\n')
+            indices=self.indices(), prefix=self.PREFIX, separator='\n')
 
 
     def generating_function(self):
@@ -107,7 +107,7 @@ class Partitioner(SageObject):
         r"""
         EXAMPLES::
 
-            sage: p = get_polytopes(2, verbose=False)[0]
+            sage: p = classification_strategy(2, verbose=False)[0]
             sage: p.classify_element(5, [10, 20])
             (0, 1)
             sage: p.classify_element(15, [10, 20])
@@ -115,7 +115,7 @@ class Partitioner(SageObject):
             sage: p.classify_element(25, [10, 20])
             (2, 2)
 
-            sage: p = get_polytopes(3, verbose=False)[1]
+            sage: p = classification_strategy(3, verbose=False)[1]
             sage: p.classify_element(5, [10, 20, 30])
             (0, 1)
             sage: p.classify_element(15, [10, 20, 30])
@@ -139,30 +139,30 @@ class Partitioner(SageObject):
                 current = current.right
 
 
-def get_partitioners(r):
+def classification_trees(r):
     if not r:
         yield None
         return
     for i, top in enumerate(r):
-        for left in get_partitioners(r[:i]):
-            for right in get_partitioners(r[i+1:]):
-                yield Partitioner(top, left, right)
+        for left in classification_trees(r[:i]):
+            for right in classification_trees(r[i+1:]):
+                yield ClassificationTree(top, left, right)
 
 
 def break_tie(values, undo=False):
     r"""
     EXAMPLES::
 
-        sage: for p in get_polytopes(2, verbose=False):
+        sage: for p in classification_strategy(2, verbose=False):
         ....:     print(Polyhedron(
         ....:         ieqs=[break_tie(tuple(ieq))
-        ....:               for ieq in p.polytope.inequalities()]).repr_pretty_Hrepresentation())
+        ....:               for ieq in p.polyhedron.inequalities()]).repr_pretty_Hrepresentation())
         x2 >= 0, x1 >= 0, x0 >= x2
         x2 >= x0 + 1, x1 >= 0, x0 >= 0
-        sage: for p in get_polytopes(3, verbose=False):
+        sage: for p in classification_strategy(3, verbose=False):
         ....:     print(Polyhedron(
         ....:         ieqs=[break_tie(tuple(ieq))
-        ....:               for ieq in p.polytope.inequalities()]).repr_pretty_Hrepresentation())
+        ....:               for ieq in p.polyhedron.inequalities()]).repr_pretty_Hrepresentation())
         x3 >= 0, x2 >= 0, x1 >= x3, x0 >= x2 + x3 + 2
         x3 >= x1 + 1, x2 >= 0, x1 >= 0, x0 >= x1 + x2 + 2, x0 >= x3
         x2 + x3 + 1 >= x0, x1 + x2 + 1 >= x0, x3 >= 0, x2 >= 0, x1 >= 0, x1 + x2 + 1 >= x3, x0 >= 0, x0 + x1 + 1 >= x3
@@ -298,38 +298,38 @@ def repr_pretty_Hrepresentation(self, separator=', ',
     return separator.join(repr_ieq(h) for h in P.Hrepresentation())
 
 
-def get_polytopes(dimension, make_disjoint=False, verbose=True):
+def classification_strategy(dimension, make_disjoint=False, verbose=True):
     r"""
     EXAMPLES::
 
-        sage: p2 = get_polytopes(2)
+        sage: p2 = classification_strategy(2)
         *********************************
-        Partitioner 1 () (2 () ())
+        classification tree 1 () (2 () ())
         s2 >= 0
         s1 >= 0
         s0 >= s2
         *********************************
-        Partitioner 2 (1 () ()) ()
+        classification tree 2 (1 () ()) ()
         s2 >= s0
         s0 >= 0
         s1 >= 0
 
-        sage: p3 = get_polytopes(3)
+        sage: p3 = classification_strategy(3)
         *********************************
-        Partitioner 1 () (2 () (3 () ()))
+        classification tree 1 () (2 () (3 () ()))
         s3 >= 0
         s2 >= 0
         s1 >= s3
         s0 >= s2 + s3 + 1
         *********************************
-        Partitioner 1 () (3 (2 () ()) ())
+        classification tree 1 () (3 (2 () ()) ())
         s3 >= s1
         s0 >= s3
         s2 >= 0
         s1 >= 0
         s0 >= s1 + s2 + 1
         *********************************
-        Partitioner 2 (1 () ()) (3 () ())
+        classification tree 2 (1 () ()) (3 () ())
         s2 + s3 + 1 >= s0
         s1 + s2 + 1 >= s0
         s3 >= 0
@@ -339,14 +339,14 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
         s0 >= 0
         s0 + s1 + 1 >= s3
         *********************************
-        Partitioner 3 (1 () (2 () ())) ()
+        classification tree 3 (1 () (2 () ())) ()
         s0 >= s2
         s3 >= s0
         s3 >= s1 + s2 + 1
         s1 >= 0
         s2 >= 0
         *********************************
-        Partitioner 3 (2 (1 () ()) ()) ()
+        classification tree 3 (2 (1 () ()) ()) ()
         s0 >= 0
         s1 >= 0
         s3 >= s0 + s1 + 1
@@ -354,34 +354,34 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
 
     TESTS::
 
-        sage: p2 = get_polytopes(2, make_disjoint=True)
+        sage: p2 = classification_strategy(2, make_disjoint=True)
         *********************************
-        Partitioner 1 () (2 () ())
+        classification tree 1 () (2 () ())
         s2 >= 0
         s1 >= 0
         s0 >= s2
         *********************************
-        Partitioner 2 (1 () ()) ()
+        classification tree 2 (1 () ()) ()
         s2 > s0
         s1 >= 0
         s0 >= 0
 
-        sage: p3 = get_polytopes(3, make_disjoint=True)
+        sage: p3 = classification_strategy(3, make_disjoint=True)
         *********************************
-        Partitioner 1 () (2 () (3 () ()))
+        classification tree 1 () (2 () (3 () ()))
         s3 >= 0
         s2 >= 0
         s1 >= s3
         s0 > s2 + s3 + 1
         *********************************
-        Partitioner 1 () (3 (2 () ()) ())
+        classification tree 1 () (3 (2 () ()) ())
         s3 > s1
         s2 >= 0
         s1 >= 0
         s0 > s1 + s2 + 1
         s0 >= s3
         *********************************
-        Partitioner 2 (1 () ()) (3 () ())
+        classification tree 2 (1 () ()) (3 () ())
         s2 + s3 + 1 >= s0
         s1 + s2 + 1 >= s0
         s3 >= 0
@@ -391,14 +391,14 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
         s0 >= 0
         s0 + s1 + 1 >= s3
         *********************************
-        Partitioner 3 (1 () (2 () ())) ()
+        classification tree 3 (1 () (2 () ())) ()
         s3 > s0
         s3 > s1 + s2 + 1
         s2 >= 0
         s1 >= 0
         s0 > s2
         *********************************
-        Partitioner 3 (2 (1 () ()) ()) ()
+        classification tree 3 (2 (1 () ()) ()) ()
         s3 > s0 + s1 + 1
         s2 >= s0
         s1 >= 0
@@ -412,29 +412,29 @@ def get_polytopes(dimension, make_disjoint=False, verbose=True):
         constant = inequality - sum(c*v for c, v in zip(coefficients, vars))
         return [constant] + coefficients
     
-    partitioners = list(p for p in get_partitioners(range(1, dimension + 1)))
-    prefix = partitioners[0].PREFIX
+    trees = list(p for p in classification_trees(range(1, dimension + 1)))
+    prefix = trees[0].PREFIX
     vars = list(SR(prefix + "{}".format(j)) for j in range(dimension+1))
-    for this in partitioners:
-        others = list(partitioners)
+    for this in trees:
+        others = list(trees)
         others.remove(this)
         ineqs = [other.partition_cost() - this.partition_cost() for other in others] + vars
         ineq_matrix = [get_vector(ineq, vars) for ineq in ineqs]
         P = Polyhedron(ieqs=ineq_matrix)
         if make_disjoint:
             P = polyhedron_break_tie(P)
-        this.polytope = P
+        this.polyhedron = P
         if verbose:
             print("*********************************")
-            print("Partitioner {}".format(this))
-            print(this.repr_pretty_polytope(strict_inequality=make_disjoint))
+            print("classification tree {}".format(this))
+            print(this.repr_pretty_polyhedron(strict_inequality=make_disjoint))
 
-    dim = partitioners[0].polytope.ambient_dim()
+    dim = trees[0].polyhedron.ambient_dim()
     nonnegative_orthant = Polyhedron(ieqs=[dd*(0,) + (1,) + (dim-dd)*(0,)
                                            for dd in range(1, dim+1)])
-    assert all(A.polytope & nonnegative_orthant == A.polytope
-               for A in partitioners)
+    assert all(A.polyhedron & nonnegative_orthant == A.polyhedron
+               for A in trees)
     if make_disjoint:
-        assert all((A.polytope & B.polytope).is_empty()
-                   for A in partitioners for B in partitioners if A != B)
-    return partitioners
+        assert all((A.polyhedron & B.polyhedron).is_empty()
+                   for A in trees for B in trees if A != B)
+    return trees
