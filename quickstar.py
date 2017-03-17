@@ -3,6 +3,10 @@ r"""
 Test-Suites
 ===========
 
+::
+
+    sage: from quickstar import QuickStar
+
 Preparation
 -----------
 
@@ -398,7 +402,9 @@ def min_with_index(values):
 class QuickStar(object):
     r"""
 
-    EXAMPLES:
+    EXAMPLES::
+
+        sage: from quickstar import QuickStar
 
     Classical quicksort::
 
