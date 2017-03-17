@@ -674,6 +674,114 @@ class QuickStar(object):
 
 
     def partitioned_trees(self, L, strategy):
+        r"""
+        EXAMPLES::
+
+            sage: from partitioner import classification_strategy
+            sage: from quickstar import QuickStar
+
+        Classification Strategy::
+
+            sage: cs2 = classification_strategy(2, verbose=False)
+            sage: cs3 = classification_strategy(3, verbose=False)
+            sage: cs4 = classification_strategy(4, verbose=False)
+
+        Partitioning::
+
+            sage: P2qs = [QuickStar().avg_comparisons_partition(
+            ....:             n, 'partitioned_trees', strategy=cs2,
+            ....:             verbose=True)
+            ....:         for n in srange(7)]
+            n=0, cmp=0, avg=0
+            n=1, cmp=0, avg=0
+            n=2, cmp=2, avg=1
+            n=3, cmp=16, avg=8/3
+            n=4, cmp=102, avg=17/4
+            n=5, cmp=698, avg=349/60
+            n=6, cmp=5304, avg=221/30
+            sage: [QuickStar().avg_comparisons_partition(
+            ....:             n, 'partitioned_polyhedra', strategy=cs2)
+            ....:         for n in srange(7)] == P2qs
+            True
+            sage: [QuickStar().avg_comparisons_partition(
+            ....:             n, 'partitioned_dual_count')
+            ....:         for n in srange(7)] == P2qs
+            True
+
+            sage: P3qs = [QuickStar().avg_comparisons_partition(
+            ....:             n, 'partitioned_trees', strategy=cs3,
+            ....:             verbose=True)
+            ....:         for n in srange(7)]
+            n=0, cmp=0, avg=0
+            n=1, cmp=0, avg=0
+            n=2, cmp=2, avg=1
+            n=3, cmp=16, avg=8/3
+            n=4, cmp=112, avg=14/3
+            n=5, cmp=800, avg=20/3
+            n=6, cmp=6216, avg=259/30
+            sage: [QuickStar().avg_comparisons_partition(
+            ....:             n, 'partitioned_polyhedra', strategy=cs3)
+            ....:         for n in srange(7)] == P3qs
+            True
+
+            sage: P4qs = [QuickStar().avg_comparisons_partition(
+            ....:             n, 'partitioned_trees', strategy=cs4,
+            ....:             verbose=True)
+            ....:         for n in srange(7)]
+            n=0, cmp=0, avg=0
+            n=1, cmp=0, avg=0
+            n=2, cmp=2, avg=1
+            n=3, cmp=16, avg=8/3
+            n=4, cmp=112, avg=14/3
+            n=5, cmp=848, avg=106/15
+            n=6, cmp=6768, avg=47/5
+            sage: [QuickStar().avg_comparisons_partition(
+            ....:             n, 'partitioned_polyhedra', strategy=cs4)
+            ....:         for n in srange(7)] == P4qs
+            True
+
+        Quicksort::
+
+            sage: Q2qs = [QuickStar().avg_comparisons_quicksort(
+            ....:             n, 'partitioned_trees', strategy=cs2,
+            ....:             verbose=True)
+            ....:         for n in srange(7)]
+            n=0, cmp=0, avg=0
+            n=1, cmp=0, avg=0
+            n=2, cmp=2, avg=1
+            n=3, cmp=16, avg=8/3
+            n=4, cmp=114, avg=19/4
+            n=5, cmp=866, avg=433/60
+            n=6, cmp=7188, avg=599/60
+            sage: [QuickStar().avg_comparisons_quicksort(
+            ....:             n, 'partitioned_dual_count')
+            ....:         for n in srange(7)] == Q2qs
+            True
+
+            sage: Q3qs = [QuickStar().avg_comparisons_quicksort(
+            ....:             n, 'partitioned_trees', strategy=cs3,
+            ....:             verbose=True)
+            ....:         for n in srange(7)]
+            n=0, cmp=0, avg=0
+            n=1, cmp=0, avg=0
+            n=2, cmp=2, avg=1
+            n=3, cmp=16, avg=8/3
+            n=4, cmp=112, avg=14/3
+            n=5, cmp=848, avg=106/15
+            n=6, cmp=7032, avg=293/30
+
+            sage: Q4qs = [QuickStar().avg_comparisons_quicksort(
+            ....:             n, 'partitioned_trees', strategy=cs4,
+            ....:             verbose=True)
+            ....:         for n in srange(7)]
+            n=0, cmp=0, avg=0
+            n=1, cmp=0, avg=0
+            n=2, cmp=2, avg=1
+            n=3, cmp=16, avg=8/3
+            n=4, cmp=112, avg=14/3
+            n=5, cmp=848, avg=106/15
+            n=6, cmp=7008, avg=146/15
+        """
         d = strategy.d()
         iterL = iter(L)
 
