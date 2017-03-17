@@ -298,7 +298,10 @@ def repr_pretty_Hrepresentation(self, separator=', ',
     return separator.join(repr_ieq(h) for h in P.Hrepresentation())
 
 
-def classification_strategy(dimension, make_disjoint=False, verbose=True):
+def classification_strategy(dimension,
+                            make_disjoint=False,
+                            verbose=True,
+                            trees=None):
     r"""
     EXAMPLES::
 
@@ -412,7 +415,10 @@ def classification_strategy(dimension, make_disjoint=False, verbose=True):
         constant = inequality - sum(c*v for c, v in zip(coefficients, vars))
         return [constant] + coefficients
     
-    trees = list(p for p in classification_trees(range(1, dimension + 1)))
+    if trees is None:
+        trees = iter(p for p in classification_trees(range(1, dimension + 1)))
+    trees = list(trees)
+
     prefix = trees[0].PREFIX
     vars = list(SR(prefix + "{}".format(j)) for j in range(dimension+1))
     for this in trees:
