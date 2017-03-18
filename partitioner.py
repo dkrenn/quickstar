@@ -323,6 +323,12 @@ def new_ClassificationStrategy(arg, disjoint=False):
 
 class ClassificationStrategy(tuple):
 
+    def __iter__(self):
+        return iter(self.trees)
+
+    def __getitem__(self, i):
+        return self.trees[i]
+
     def __repr__(self):
         return '\n'.join(
             '*********************************' + '\n' +
