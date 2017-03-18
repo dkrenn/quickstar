@@ -653,7 +653,7 @@ class QuickStar(object):
 
 
     def partitioned_polyhedra(self, L, strategy):
-        d = strategy.d()
+        d = strategy.dimension()
         iterL = iter(L)
 
         pivots = sorted(next(iterL) for _ in range(d))
@@ -782,7 +782,7 @@ class QuickStar(object):
             n=5, cmp=848, avg=106/15
             n=6, cmp=7008, avg=146/15
         """
-        d = strategy.d()
+        d = strategy.dimension()
         iterL = iter(L)
 
         pivots = sorted(next(iterL) for _ in range(d))

@@ -315,97 +315,7 @@ def repr_pretty_Hrepresentation(self, separator=', ',
     return separator.join(repr_ieq(h) for h in P.Hrepresentation())
 
 
-def new_ClassificationStrategy(arg, disjoint=False):
-    cs = ClassificationStrategy(arg)
-    cs._disjoint_ = disjoint
-    return cs
-
-
 class ClassificationStrategy(SageObject):
-
-    def __init__(self):
-        super(self, ClassificationStrategy).__init__()
-
-        from sage.geometry.polyhedron.constructor import Polyhedron
-        from sage.symbolic.ring import SR
-
-        def get_vector(inequality, vars):
-            coefficients = list(inequality.coefficient(var) for var in vars)
-            constant = inequality - sum(c*v for c, v in zip(coefficients, vars))
-            return [constant] + coefficients
-
-        if trees is None:
-            trees = iter(p for p in classification_trees(range(1, dimension + 1)))
-        strategy = new_ClassificationStrategy(trees, disjoint=make_disjoint)
-
-        prefix = strategy[0].PREFIX
-        vars = list(SR(prefix + "{}".format(j)) for j in range(dimension+1))
-        for this in strategy:
-            others = list(strategy)
-            others.remove(this)
-            ineqs = [other.partition_cost() - this.partition_cost() for other in others] + vars
-            ineq_matrix = [get_vector(ineq, vars) for ineq in ineqs]
-            P = Polyhedron(ieqs=ineq_matrix)
-            if make_disjoint:
-                P = polyhedron_break_tie(P)
-            this.polyhedron = P
-
-        dim = strategy[0].polyhedron.ambient_dim()
-        nonnegative_orthant = Polyhedron(ieqs=[dd*(0,) + (1,) + (dim-dd)*(0,)
-                                               for dd in range(1, dim+1)])
-        assert all(A.polyhedron & nonnegative_orthant == A.polyhedron
-                   for A in strategy)
-        if make_disjoint:
-            assert all((A.polyhedron & B.polyhedron).is_empty()
-                       for A in strategy for B in strategy if A != B)
-        if verbose:
-            print(repr(strategy))
-        return strategy
-
-    def __iter__(self):
-        return iter(self.trees)
-
-    def __getitem__(self, i):
-        return self.trees[i]
-
-    def __repr__(self):
-        return '\n'.join(
-            '*********************************' + '\n' +
-            'classification tree {}'.format(tree) + '\n' +
-            tree.repr_pretty_polyhedron(
-                strict_inequality=self._disjoint_)
-            for tree in self)
-
-    def indices(self):
-        assert len(set(tree.indices() for tree in self)) <= 1
-        return self[0].indices()
-
-    def d(self):
-        from sage.rings.integer_ring import ZZ
-        d = len(self.indices()) - 1
-        assert d == self[0].polyhedron.ambient_dim() - 1
-        return ZZ(d)
-
-    def H(self):
-        from sage.modules.free_module_element import vector
-        return {i: vector(tree.height(i) for tree in self)
-                for i in self.indices()}
-
-    def next_classification_tree_by_counts(self, counts):
-        return next(tree for tree in self
-                    if tree.polyhedron.contains(counts))
-
-    def nonempty_subsets(self):
-        from sage.misc.misc import subsets
-        return iter(new_ClassificationStrategy(s, disjoint=self._disjoint_)
-                    for s in subsets(self)
-                    if s)
-
-
-def classification_strategy(dimension,
-                            make_disjoint=False,
-                            verbose=True,
-                            trees=None):
     r"""
     EXAMPLES::
 
@@ -513,3 +423,96 @@ def classification_strategy(dimension,
         s1 >= 0
         s0 >= 0
     """
+
+    def __init__(self, dimension,
+                       make_disjoint=False,
+                       trees=None,
+                       verbose=True):
+        from sage.rings.integer_ring import ZZ
+
+        super(ClassificationStrategy, self).__init__()
+
+        self._disjoint_ = make_disjoint
+        self._dimension_ = ZZ(dimension)
+
+        if trees is None:
+            trees = iter(p for p in classification_trees(range(1, dimension + 1)))
+        self.trees = tuple(trees)
+        assert self.dimension() == len(self.indices()) - 1
+
+        self.populate_polyhedra()
+        assert self.dimension() == self.trees[0].polyhedron.ambient_dim() - 1
+
+        if verbose:
+            print(repr(self))
+
+    def populate_polyhedra(self):
+        from sage.geometry.polyhedron.constructor import Polyhedron
+        from sage.symbolic.ring import SR
+
+        def get_vector(inequality, vars):
+            coefficients = list(inequality.coefficient(var) for var in vars)
+            constant = inequality - sum(c*v for c, v in zip(coefficients, vars))
+            return [constant] + coefficients
+
+        d = self.dimension()
+        prefix = self.trees[0].PREFIX
+        vars = list(SR(prefix + "{}".format(j)) for j in range(d+1))
+        for tree in self.trees:
+            others = list(self.trees)
+            others.remove(tree)
+            ineqs = [other.partition_cost() - tree.partition_cost()
+                     for other in others] + vars
+            ineq_matrix = [get_vector(ineq, vars) for ineq in ineqs]
+            P = Polyhedron(ieqs=ineq_matrix)
+            if self._disjoint_:
+                P = polyhedron_break_tie(P)
+            tree.polyhedron = P
+
+        nonnegative_orthant = Polyhedron(ieqs=[dd*(0,) + (1,) + (d+1-dd)*(0,)
+                                               for dd in range(1, d+1+1)])
+        assert all(A.polyhedron & nonnegative_orthant == A.polyhedron
+                   for A in self)
+        if self._disjoint_:
+            assert all((A.polyhedron & B.polyhedron).is_empty()
+                       for A in self for B in self if A != B)
+
+    def __iter__(self):
+        return iter(self.trees)
+
+    def __getitem__(self, i):
+        return self.trees[i]
+
+    def __repr__(self):
+        return '\n'.join(
+            '*********************************' + '\n' +
+            'classification tree {}'.format(tree) + '\n' +
+            tree.repr_pretty_polyhedron(
+                strict_inequality=self._disjoint_)
+            for tree in self)
+
+    def indices(self):
+        assert len(set(tree.indices() for tree in self)) <= 1
+        return self.trees[0].indices()
+
+    def dimension(self):
+        return self._dimension_
+
+    def H(self):
+        from sage.modules.free_module_element import vector
+        return {i: vector(tree.height(i) for tree in self)
+                for i in self.indices()}
+
+    def next_classification_tree_by_counts(self, counts):
+        return next(tree for tree in self
+                    if tree.polyhedron.contains(counts))
+
+    def nonempty_subsets(self):
+        from sage.misc.misc import subsets
+        return iter(new_ClassificationStrategy(s, disjoint=self._disjoint_)
+                    for s in subsets(self)
+                    if s)
+
+
+def classification_strategy(*args, **kwds):
+    return ClassificationStrategy(*args, **kwds)
