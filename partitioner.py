@@ -322,6 +322,41 @@ def new_ClassificationStrategy(arg, disjoint=False):
 
 
 class ClassificationStrategy(tuple):
+        from sage.geometry.polyhedron.constructor import Polyhedron
+        from sage.symbolic.ring import SR
+
+        def get_vector(inequality, vars):
+            coefficients = list(inequality.coefficient(var) for var in vars)
+            constant = inequality - sum(c*v for c, v in zip(coefficients, vars))
+            return [constant] + coefficients
+
+        if trees is None:
+            trees = iter(p for p in classification_trees(range(1, dimension + 1)))
+        strategy = new_ClassificationStrategy(trees, disjoint=make_disjoint)
+
+        prefix = strategy[0].PREFIX
+        vars = list(SR(prefix + "{}".format(j)) for j in range(dimension+1))
+        for this in strategy:
+            others = list(strategy)
+            others.remove(this)
+            ineqs = [other.partition_cost() - this.partition_cost() for other in others] + vars
+            ineq_matrix = [get_vector(ineq, vars) for ineq in ineqs]
+            P = Polyhedron(ieqs=ineq_matrix)
+            if make_disjoint:
+                P = polyhedron_break_tie(P)
+            this.polyhedron = P
+
+        dim = strategy[0].polyhedron.ambient_dim()
+        nonnegative_orthant = Polyhedron(ieqs=[dd*(0,) + (1,) + (dim-dd)*(0,)
+                                               for dd in range(1, dim+1)])
+        assert all(A.polyhedron & nonnegative_orthant == A.polyhedron
+                   for A in strategy)
+        if make_disjoint:
+            assert all((A.polyhedron & B.polyhedron).is_empty()
+                       for A in strategy for B in strategy if A != B)
+        if verbose:
+            print(repr(strategy))
+        return strategy
 
     def __iter__(self):
         return iter(self.trees)
@@ -474,38 +509,3 @@ def classification_strategy(dimension,
         s1 >= 0
         s0 >= 0
     """
-    from sage.geometry.polyhedron.constructor import Polyhedron
-    from sage.symbolic.ring import SR
-
-    def get_vector(inequality, vars):
-        coefficients = list(inequality.coefficient(var) for var in vars)
-        constant = inequality - sum(c*v for c, v in zip(coefficients, vars))
-        return [constant] + coefficients
-    
-    if trees is None:
-        trees = iter(p for p in classification_trees(range(1, dimension + 1)))
-    strategy = new_ClassificationStrategy(trees, disjoint=make_disjoint)
-
-    prefix = strategy[0].PREFIX
-    vars = list(SR(prefix + "{}".format(j)) for j in range(dimension+1))
-    for this in strategy:
-        others = list(strategy)
-        others.remove(this)
-        ineqs = [other.partition_cost() - this.partition_cost() for other in others] + vars
-        ineq_matrix = [get_vector(ineq, vars) for ineq in ineqs]
-        P = Polyhedron(ieqs=ineq_matrix)
-        if make_disjoint:
-            P = polyhedron_break_tie(P)
-        this.polyhedron = P
-
-    dim = strategy[0].polyhedron.ambient_dim()
-    nonnegative_orthant = Polyhedron(ieqs=[dd*(0,) + (1,) + (dim-dd)*(0,)
-                                           for dd in range(1, dim+1)])
-    assert all(A.polyhedron & nonnegative_orthant == A.polyhedron
-               for A in strategy)
-    if make_disjoint:
-        assert all((A.polyhedron & B.polyhedron).is_empty()
-                   for A in strategy for B in strategy if A != B)
-    if verbose:
-        print(repr(strategy))
-    return strategy
