@@ -487,7 +487,7 @@ class ClassificationStrategy(SageObject):
     def __getitem__(self, i):
         return self.trees[i]
 
-    def __repr__(self):
+    def _repr_(self):
         return '\n'.join(
             '*********************************' + '\n' +
             'classification tree {}'.format(tree) + '\n' +
