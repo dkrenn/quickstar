@@ -109,22 +109,22 @@ class ClassificationTree(SageObject):
 
             sage: from partitioner import classification_strategy
 
-            sage: p = classification_strategy(2, verbose=False)[0]
-            sage: p.classify_element(5, [10, 20])
+            sage: T = classification_strategy(2)[0]
+            sage: T.classify_element(5, [10, 20])
             (0, 1)
-            sage: p.classify_element(15, [10, 20])
+            sage: T.classify_element(15, [10, 20])
             (1, 2)
-            sage: p.classify_element(25, [10, 20])
+            sage: T.classify_element(25, [10, 20])
             (2, 2)
 
-            sage: p = classification_strategy(3, verbose=False)[1]
-            sage: p.classify_element(5, [10, 20, 30])
+            sage: T = classification_strategy(3)[1]
+            sage: T.classify_element(5, [10, 20, 30])
             (0, 1)
-            sage: p.classify_element(15, [10, 20, 30])
+            sage: T.classify_element(15, [10, 20, 30])
             (1, 3)
-            sage: p.classify_element(25, [10, 20, 30])
+            sage: T.classify_element(25, [10, 20, 30])
             (2, 3)
-            sage: p.classify_element(35, [10, 20, 30])
+            sage: T.classify_element(35, [10, 20, 30])
             (3, 2)
         """
         comparisons = 0
@@ -157,16 +157,16 @@ def break_tie(values, undo=False):
 
         sage: from partitioner import classification_strategy, break_tie
 
-        sage: for p in classification_strategy(2, verbose=False):
+        sage: for cs in classification_strategy(2):
         ....:     print(Polyhedron(
         ....:         ieqs=[break_tie(tuple(ieq))
-        ....:               for ieq in p.polyhedron.inequalities()]).repr_pretty_Hrepresentation())
+        ....:               for ieq in cs.polyhedron.inequalities()]).repr_pretty_Hrepresentation())
         x2 >= 0, x1 >= 0, x0 >= x2
         x2 >= x0 + 1, x1 >= 0, x0 >= 0
-        sage: for p in classification_strategy(3, verbose=False):
+        sage: for cs in classification_strategy(3):
         ....:     print(Polyhedron(
         ....:         ieqs=[break_tie(tuple(ieq))
-        ....:               for ieq in p.polyhedron.inequalities()]).repr_pretty_Hrepresentation())
+        ....:               for ieq in cs.polyhedron.inequalities()]).repr_pretty_Hrepresentation())
         x3 >= 0, x2 >= 0, x1 >= x3, x0 >= x2 + x3 + 2
         x3 >= x1 + 1, x2 >= 0, x1 >= 0, x0 >= x1 + x2 + 2, x0 >= x3
         x2 + x3 + 1 >= x0, x1 + x2 + 1 >= x0, x3 >= 0, x2 >= 0, x1 >= 0, x1 + x2 + 1 >= x3, x0 >= 0, x0 + x1 + 1 >= x3
@@ -430,8 +430,7 @@ class ClassificationStrategy(SageObject):
 
     def __init__(self, dimension,
                        make_disjoint=False,
-                       trees=None,
-                       verbose=False):
+                       trees=None):
         from sage.rings.integer_ring import ZZ
 
         super(ClassificationStrategy, self).__init__()
@@ -446,9 +445,6 @@ class ClassificationStrategy(SageObject):
 
         self.populate_polyhedra()
         assert self.dimension() == self.trees[0].polyhedron.ambient_dim() - 1
-
-        if verbose:
-            print(repr(self))
 
     def populate_polyhedra(self):
         from sage.geometry.polyhedron.constructor import Polyhedron
