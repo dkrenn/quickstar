@@ -323,12 +323,14 @@ class ClassificationStrategy(SageObject):
 
         sage: cs2 = classification_strategy(2)
         sage: cs2
-        *********************************
+        ====================================
+        classification strategy with 2 trees
+        ------------------------------------
         classification tree 1 () (2 () ())
         s2 >= 0
         s1 >= 0
         s0 >= s2
-        *********************************
+        ------------------------------------
         classification tree 2 (1 () ()) ()
         s2 >= s0
         s0 >= 0
@@ -336,20 +338,22 @@ class ClassificationStrategy(SageObject):
 
         sage: cs3 = classification_strategy(3)
         sage: cs3
-        *********************************
+        ====================================
+        classification strategy with 5 trees
+        ------------------------------------
         classification tree 1 () (2 () (3 () ()))
         s3 >= 0
         s2 >= 0
         s1 >= s3
         s0 >= s2 + s3 + 1
-        *********************************
+        ------------------------------------
         classification tree 1 () (3 (2 () ()) ())
         s3 >= s1
         s0 >= s3
         s2 >= 0
         s1 >= 0
         s0 >= s1 + s2 + 1
-        *********************************
+        ------------------------------------
         classification tree 2 (1 () ()) (3 () ())
         s2 + s3 + 1 >= s0
         s1 + s2 + 1 >= s0
@@ -359,14 +363,14 @@ class ClassificationStrategy(SageObject):
         s1 + s2 + 1 >= s3
         s0 >= 0
         s0 + s1 + 1 >= s3
-        *********************************
+        ------------------------------------
         classification tree 3 (1 () (2 () ())) ()
         s0 >= s2
         s3 >= s0
         s3 >= s1 + s2 + 1
         s1 >= 0
         s2 >= 0
-        *********************************
+        ------------------------------------
         classification tree 3 (2 (1 () ()) ()) ()
         s0 >= 0
         s1 >= 0
@@ -377,12 +381,14 @@ class ClassificationStrategy(SageObject):
 
         sage: cs2 = classification_strategy(2, make_disjoint=True)
         sage: cs2
-        *********************************
+        ====================================
+        classification strategy with 2 trees
+        ------------------------------------
         classification tree 1 () (2 () ())
         s2 >= 0
         s1 >= 0
         s0 >= s2
-        *********************************
+        ------------------------------------
         classification tree 2 (1 () ()) ()
         s2 > s0
         s1 >= 0
@@ -390,20 +396,22 @@ class ClassificationStrategy(SageObject):
 
         sage: cs3 = classification_strategy(3, make_disjoint=True)
         sage: cs3
-        *********************************
+        ====================================
+        classification strategy with 5 trees
+        ------------------------------------
         classification tree 1 () (2 () (3 () ()))
         s3 >= 0
         s2 >= 0
         s1 >= s3
         s0 > s2 + s3 + 1
-        *********************************
+        ------------------------------------
         classification tree 1 () (3 (2 () ()) ())
         s3 > s1
         s2 >= 0
         s1 >= 0
         s0 > s1 + s2 + 1
         s0 >= s3
-        *********************************
+        ------------------------------------
         classification tree 2 (1 () ()) (3 () ())
         s2 + s3 + 1 >= s0
         s1 + s2 + 1 >= s0
@@ -413,14 +421,14 @@ class ClassificationStrategy(SageObject):
         s1 + s2 + 1 >= s3
         s0 >= 0
         s0 + s1 + 1 >= s3
-        *********************************
+        ------------------------------------
         classification tree 3 (1 () (2 () ())) ()
         s3 > s0
         s3 > s1 + s2 + 1
         s2 >= 0
         s1 >= 0
         s0 > s2
-        *********************************
+        ------------------------------------
         classification tree 3 (2 (1 () ()) ()) ()
         s3 > s0 + s1 + 1
         s2 >= s0
@@ -484,12 +492,16 @@ class ClassificationStrategy(SageObject):
         return self.trees[i]
 
     def _repr_(self):
-        return '\n'.join(
-            '*********************************' + '\n' +
+        return (
+            '====================================' + '\n' +
+            'classification strategy with {} trees'.format(len(self.trees)) +
+            '\n' +
+            '\n'.join(
+            '------------------------------------' + '\n' +
             'classification tree {}'.format(tree) + '\n' +
             tree.repr_pretty_polyhedron(
                 strict_inequality=self._disjoint_)
-            for tree in self.trees)
+            for tree in self.trees))
 
     def indices(self):
         assert len(set(tree.indices() for tree in self.trees)) <= 1
@@ -515,22 +527,28 @@ class ClassificationStrategy(SageObject):
             sage: cs2 = classification_strategy(2, make_disjoint=True)
             sage: for cs in cs2.nonempty_subsets():
             ....:     print(cs)
-            *********************************
+            ====================================
+            classification strategy with 1 trees
+            ------------------------------------
             classification tree 1 () (2 () ())
             s2 >= 0
             s1 >= 0
             s0 >= 0
-            *********************************
+            ====================================
+            classification strategy with 1 trees
+            ------------------------------------
             classification tree 2 (1 () ()) ()
             s2 >= 0
             s1 >= 0
             s0 >= 0
-            *********************************
+            ====================================
+            classification strategy with 2 trees
+            ------------------------------------
             classification tree 1 () (2 () ())
             s2 >= 0
             s1 >= 0
             s0 >= s2
-            *********************************
+            ------------------------------------
             classification tree 2 (1 () ()) ()
             s2 > s0
             s1 >= 0
