@@ -472,10 +472,10 @@ class ClassificationStrategy(SageObject):
         nonnegative_orthant = Polyhedron(ieqs=[dd*(0,) + (1,) + (d+1-dd)*(0,)
                                                for dd in range(1, d+1+1)])
         assert all(A.polyhedron & nonnegative_orthant == A.polyhedron
-                   for A in self)
+                   for A in self.trees)
         if self._disjoint_:
             assert all((A.polyhedron & B.polyhedron).is_empty()
-                       for A in self for B in self if A != B)
+                       for A in self.trees for B in self.trees if A != B)
 
     def __iter__(self):
         return iter(self.trees)
@@ -489,10 +489,10 @@ class ClassificationStrategy(SageObject):
             'classification tree {}'.format(tree) + '\n' +
             tree.repr_pretty_polyhedron(
                 strict_inequality=self._disjoint_)
-            for tree in self)
+            for tree in self.trees)
 
     def indices(self):
-        assert len(set(tree.indices() for tree in self)) <= 1
+        assert len(set(tree.indices() for tree in self.trees)) <= 1
         return self.trees[0].indices()
 
     def dimension(self):
@@ -500,11 +500,11 @@ class ClassificationStrategy(SageObject):
 
     def H(self):
         from sage.modules.free_module_element import vector
-        return {i: vector(tree.height(i) for tree in self)
+        return {i: vector(tree.height(i) for tree in self.trees)
                 for i in self.indices()}
 
     def next_classification_tree_by_counts(self, counts):
-        return next(tree for tree in self
+        return next(tree for tree in self.trees
                     if tree.polyhedron.contains(counts))
 
     def nonempty_subsets(self):
