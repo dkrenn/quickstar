@@ -321,7 +321,11 @@ def new_ClassificationStrategy(arg, disjoint=False):
     return cs
 
 
-class ClassificationStrategy(tuple):
+class ClassificationStrategy(SageObject):
+
+    def __init__(self):
+        super(self, ClassificationStrategy).__init__()
+
         from sage.geometry.polyhedron.constructor import Polyhedron
         from sage.symbolic.ring import SR
 
