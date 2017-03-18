@@ -508,10 +508,41 @@ class ClassificationStrategy(SageObject):
                     if tree.polyhedron.contains(counts))
 
     def nonempty_subsets(self):
+        r"""
+        EXAMPLES::
+
+            sage: from partitioner import classification_strategy
+            sage: cs2 = classification_strategy(2, make_disjoint=True)
+            sage: for cs in cs2.nonempty_subsets():
+            ....:     print(cs)
+            *********************************
+            classification tree 1 () (2 () ())
+            s2 >= 0
+            s1 >= 0
+            s0 >= 0
+            *********************************
+            classification tree 2 (1 () ()) ()
+            s2 >= 0
+            s1 >= 0
+            s0 >= 0
+            *********************************
+            classification tree 1 () (2 () ())
+            s2 >= 0
+            s1 >= 0
+            s0 >= s2
+            *********************************
+            classification tree 2 (1 () ()) ()
+            s2 > s0
+            s1 >= 0
+            s0 >= 0
+        """
         from sage.misc.misc import subsets
-        return iter(new_ClassificationStrategy(s, disjoint=self._disjoint_)
-                    for s in subsets(self)
-                    if s)
+        d = self.dimension()
+        return iter(ClassificationStrategy(d,
+                                           make_disjoint=self._disjoint_,
+                                           trees=srees)
+                    for srees in subsets(self.trees)
+                    if srees)
 
 
 def classification_strategy(*args, **kwds):
