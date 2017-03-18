@@ -321,7 +321,8 @@ class ClassificationStrategy(SageObject):
 
         sage: from partitioner import classification_strategy
 
-        sage: p2 = classification_strategy(2)
+        sage: cs2 = classification_strategy(2)
+        sage: cs2
         *********************************
         classification tree 1 () (2 () ())
         s2 >= 0
@@ -333,7 +334,8 @@ class ClassificationStrategy(SageObject):
         s0 >= 0
         s1 >= 0
 
-        sage: p3 = classification_strategy(3)
+        sage: cs3 = classification_strategy(3)
+        sage: cs3
         *********************************
         classification tree 1 () (2 () (3 () ()))
         s3 >= 0
@@ -373,7 +375,8 @@ class ClassificationStrategy(SageObject):
 
     TESTS::
 
-        sage: p2 = classification_strategy(2, make_disjoint=True)
+        sage: cs2 = classification_strategy(2, make_disjoint=True)
+        sage: cs2
         *********************************
         classification tree 1 () (2 () ())
         s2 >= 0
@@ -385,7 +388,8 @@ class ClassificationStrategy(SageObject):
         s1 >= 0
         s0 >= 0
 
-        sage: p3 = classification_strategy(3, make_disjoint=True)
+        sage: cs3 = classification_strategy(3, make_disjoint=True)
+        sage: cs3
         *********************************
         classification tree 1 () (2 () (3 () ()))
         s3 >= 0
@@ -427,7 +431,7 @@ class ClassificationStrategy(SageObject):
     def __init__(self, dimension,
                        make_disjoint=False,
                        trees=None,
-                       verbose=True):
+                       verbose=False):
         from sage.rings.integer_ring import ZZ
 
         super(ClassificationStrategy, self).__init__()

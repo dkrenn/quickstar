@@ -682,9 +682,9 @@ class QuickStar(object):
 
         Classification Strategy::
 
-            sage: cs2 = classification_strategy(2, verbose=False)
-            sage: cs3 = classification_strategy(3, verbose=False)
-            sage: cs4 = classification_strategy(4, verbose=False)
+            sage: cs2 = classification_strategy(2)
+            sage: cs3 = classification_strategy(3)
+            sage: cs4 = classification_strategy(4)
 
         Partitioning::
 
