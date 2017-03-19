@@ -876,7 +876,7 @@ class ClassificationStrategy(SageObject):
             s1 >= 0
             s0 >= 0
         """
-        if not self.is_symmetric(polyhedra=True):
+        if not self.is_symmetric(polyhedra=False):
             raise ValueError('classification strategy is not symmetric')
         return iter(cs
                     for cs in self.nonempty_subsets()
