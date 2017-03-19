@@ -223,6 +223,44 @@ def classification_trees(r):
                 yield ClassificationTree(top, left, right)
 
 
+def mirror_polyhedron(polyhedron):
+    r"""
+    EXAMPLES::
+
+        sage: from partitioner import mirror_polyhedron
+
+        sage: P = Polyhedron(
+        ....:         ieqs=[(1,2,3,0), (0,1,1,0)])
+        sage: P.Hrepresentation()
+        (An inequality (1, 1, 0) x + 0 >= 0, An inequality (2, 3, 0) x + 1 >= 0)
+        sage: mirror_polyhedron(P).Hrepresentation()
+        (An inequality (0, 1, 1) x + 0 >= 0, An inequality (0, 3, 2) x + 1 >= 0)
+
+        sage: P = Polyhedron(
+        ....:         ieqs=[(1,2,3,0), (0,1,1,0)],
+        ....:         eqns=[(2,1,0,1)])
+        sage: P.Hrepresentation()
+        (An equation (1, 0, 1) x + 2 == 0,
+         An inequality (1, 1, 0) x + 0 >= 0,
+         An inequality (2, 3, 0) x + 1 >= 0)
+        sage: mirror_polyhedron(P).Hrepresentation()
+        (An equation (1, 0, 1) x + 2 == 0,
+         An inequality (-1, 1, 0) x - 2 >= 0,
+         An inequality (-2, 3, 0) x - 3 >= 0)
+    """
+    from sage.geometry.polyhedron.constructor import Polyhedron
+
+    if polyhedron is None:
+        return polyhedron
+
+    def mirror(vec):
+        return vec[:1] + tuple(reversed(vec[1:]))
+
+    return Polyhedron(
+        eqns=[mirror(tuple(eqn)) for eqn in polyhedron.equations()],
+        ieqs=[mirror(tuple(ieq)) for ieq in polyhedron.inequalities()])
+
+
 def break_tie(values, undo=False):
     r"""
     EXAMPLES::
