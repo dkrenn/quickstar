@@ -107,9 +107,9 @@ class ClassificationTree(SageObject):
         r"""
         EXAMPLES::
 
-            sage: from partitioner import classification_strategy
+            sage: from partitioner import ClassificationStrategy
 
-            sage: T = classification_strategy(2)[0]
+            sage: T = ClassificationStrategy(2)[0]
             sage: T.classify_element(5, [10, 20])
             (0, 1)
             sage: T.classify_element(15, [10, 20])
@@ -117,7 +117,7 @@ class ClassificationTree(SageObject):
             sage: T.classify_element(25, [10, 20])
             (2, 2)
 
-            sage: T = classification_strategy(3)[1]
+            sage: T = ClassificationStrategy(3)[1]
             sage: T.classify_element(5, [10, 20, 30])
             (0, 1)
             sage: T.classify_element(15, [10, 20, 30])
@@ -155,15 +155,15 @@ def break_tie(values, undo=False):
     r"""
     EXAMPLES::
 
-        sage: from partitioner import classification_strategy, break_tie
+        sage: from partitioner import ClassificationStrategy, break_tie
 
-        sage: for cs in classification_strategy(2):
+        sage: for cs in ClassificationStrategy(2):
         ....:     print(Polyhedron(
         ....:         ieqs=[break_tie(tuple(ieq))
         ....:               for ieq in cs.polyhedron.inequalities()]).repr_pretty_Hrepresentation())
         x2 >= 0, x1 >= 0, x0 >= x2
         x2 >= x0 + 1, x1 >= 0, x0 >= 0
-        sage: for cs in classification_strategy(3):
+        sage: for cs in ClassificationStrategy(3):
         ....:     print(Polyhedron(
         ....:         ieqs=[break_tie(tuple(ieq))
         ....:               for ieq in cs.polyhedron.inequalities()]).repr_pretty_Hrepresentation())
@@ -319,9 +319,9 @@ class ClassificationStrategy(SageObject):
     r"""
     EXAMPLES::
 
-        sage: from partitioner import classification_strategy
+        sage: from partitioner import ClassificationStrategy
 
-        sage: cs2 = classification_strategy(2)
+        sage: cs2 = ClassificationStrategy(2)
         sage: cs2
         ====================================
         classification strategy with 2 trees
@@ -336,7 +336,7 @@ class ClassificationStrategy(SageObject):
         s0 >= 0
         s1 >= 0
 
-        sage: cs3 = classification_strategy(3)
+        sage: cs3 = ClassificationStrategy(3)
         sage: cs3
         ====================================
         classification strategy with 5 trees
@@ -379,7 +379,7 @@ class ClassificationStrategy(SageObject):
 
     TESTS::
 
-        sage: cs2 = classification_strategy(2, make_disjoint=True)
+        sage: cs2 = ClassificationStrategy(2, make_disjoint=True)
         sage: cs2
         ====================================
         classification strategy with 2 trees
@@ -394,7 +394,7 @@ class ClassificationStrategy(SageObject):
         s1 >= 0
         s0 >= 0
 
-        sage: cs3 = classification_strategy(3, make_disjoint=True)
+        sage: cs3 = ClassificationStrategy(3, make_disjoint=True)
         sage: cs3
         ====================================
         classification strategy with 5 trees
@@ -523,8 +523,8 @@ class ClassificationStrategy(SageObject):
         r"""
         EXAMPLES::
 
-            sage: from partitioner import classification_strategy
-            sage: cs2 = classification_strategy(2, make_disjoint=True)
+            sage: from partitioner import ClassificationStrategy
+            sage: cs2 = ClassificationStrategy(2, make_disjoint=True)
             sage: for cs in cs2.nonempty_subsets():
             ....:     print(cs)
             ====================================
@@ -561,7 +561,3 @@ class ClassificationStrategy(SageObject):
                                            trees=srees)
                     for srees in subsets(self.trees)
                     if srees)
-
-
-def classification_strategy(*args, **kwds):
-    return ClassificationStrategy(*args, **kwds)

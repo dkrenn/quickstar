@@ -677,14 +677,14 @@ class QuickStar(object):
         r"""
         EXAMPLES::
 
-            sage: from partitioner import classification_strategy
+            sage: from partitioner import ClassificationStrategy
             sage: from quickstar import QuickStar
 
         Classification Strategy::
 
-            sage: cs2 = classification_strategy(2)
-            sage: cs3 = classification_strategy(3)
-            sage: cs4 = classification_strategy(4)
+            sage: cs2 = ClassificationStrategy(2)
+            sage: cs3 = ClassificationStrategy(3)
+            sage: cs4 = ClassificationStrategy(4)
 
         Partitioning::
 
