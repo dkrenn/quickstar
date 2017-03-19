@@ -634,15 +634,22 @@ class ClassificationStrategy(SageObject):
         EXAMPLES::
 
             sage: from partitioner import ClassificationStrategy
-            sage: ClassificationStrategy(2).is_symmetric()
+            sage: ClassificationStrategy(2).is_symmetric(polyhedra=False)
             True
-            sage: ClassificationStrategy(3).is_symmetric()
+            sage: ClassificationStrategy(3).is_symmetric(polyhedra=False)
             True
-            sage: ClassificationStrategy(4).is_symmetric()
+            sage: ClassificationStrategy(4).is_symmetric(polyhedra=False)
+            True
+
+            sage: ClassificationStrategy(2).is_symmetric(polyhedra=True)
+            True
+            sage: ClassificationStrategy(3).is_symmetric(polyhedra=True)
+            True
+            sage: ClassificationStrategy(4).is_symmetric(polyhedra=True)
             True
         """
         c = (len(self.trees) + 1) // 2
-        return all(a.is_mirroring_tree_of(b)
+        return all(a.is_mirroring_of(b, polyhedra=polyhedra)
                    for a, b in zip(self.trees[:c],
                                    tuple(reversed(self.trees))[:c]))
 
