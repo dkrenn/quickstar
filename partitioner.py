@@ -578,6 +578,23 @@ class ClassificationStrategy(SageObject):
         return next(tree for tree in self.trees
                     if tree.polyhedron.contains(counts))
 
+    def is_symmetric(self, polyhedra=True):
+        r"""
+        EXAMPLES::
+
+            sage: from partitioner import ClassificationStrategy
+            sage: ClassificationStrategy(2).is_symmetric()
+            True
+            sage: ClassificationStrategy(3).is_symmetric()
+            True
+            sage: ClassificationStrategy(4).is_symmetric()
+            True
+        """
+        c = (len(self.trees) + 1) // 2
+        return all(a.is_mirroring_tree_of(b)
+                   for a, b in zip(self.trees[:c],
+                                   tuple(reversed(self.trees))[:c]))
+
     def nonempty_subsets(self):
         r"""
         EXAMPLES::
