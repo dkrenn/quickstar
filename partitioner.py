@@ -637,3 +637,189 @@ class ClassificationStrategy(SageObject):
                                            trees=srees)
                     for srees in subsets(self.trees)
                     if srees)
+
+    def symmetric_subsets(self):
+        r"""
+        EXAMPLES::
+
+            sage: from partitioner import ClassificationStrategy
+
+            sage: cs2 = ClassificationStrategy(2, make_disjoint=True)
+            sage: for cs in cs2.symmetric_subsets():
+            ....:     print(cs)
+            ====================================
+            classification strategy with 2 trees
+            ------------------------------------
+            classification tree 1 () (2 () ())
+            s2 >= 0
+            s1 >= 0
+            s0 >= s2
+            ------------------------------------
+            classification tree 2 (1 () ()) ()
+            s2 > s0
+            s1 >= 0
+            s0 >= 0
+
+            sage: cs3 = ClassificationStrategy(3, make_disjoint=True)
+            sage: for cs in cs3.symmetric_subsets():
+            ....:     print(cs)
+            ====================================
+            classification strategy with 1 trees
+            ------------------------------------
+            classification tree 2 (1 () ()) (3 () ())
+            s3 >= 0
+            s2 >= 0
+            s1 >= 0
+            s0 >= 0
+            ====================================
+            classification strategy with 2 trees
+            ------------------------------------
+            classification tree 1 () (3 (2 () ()) ())
+            s3 >= 0
+            s2 >= 0
+            s1 >= 0
+            s0 >= s3
+            ------------------------------------
+            classification tree 3 (1 () (2 () ())) ()
+            s3 > s0
+            s2 >= 0
+            s1 >= 0
+            s0 >= 0
+            ====================================
+            classification strategy with 3 trees
+            ------------------------------------
+            classification tree 1 () (3 (2 () ()) ())
+            s3 >= 0
+            s2 >= 0
+            s1 >= 0
+            s0 > s1 + s2 + 1
+            s0 >= s3
+            ------------------------------------
+            classification tree 2 (1 () ()) (3 () ())
+            s1 + s2 + 1 >= s0
+            s3 >= 0
+            s2 >= 0
+            s1 >= 0
+            s1 + s2 + 1 >= s3
+            s0 >= 0
+            ------------------------------------
+            classification tree 3 (1 () (2 () ())) ()
+            s3 > s0
+            s3 > s1 + s2 + 1
+            s2 >= 0
+            s1 >= 0
+            s0 >= 0
+            ====================================
+            classification strategy with 2 trees
+            ------------------------------------
+            classification tree 1 () (2 () (3 () ()))
+            s3 >= 0
+            s2 >= 0
+            s1 >= 0
+            s0 >= 0
+            2*s0 + s1 >= s2 + 2*s3
+            ------------------------------------
+            classification tree 3 (2 (1 () ()) ()) ()
+            s2 + 2*s3 > 2*s0 + s1
+            s3 >= 0
+            s2 >= 0
+            s1 >= 0
+            s0 >= 0
+            ====================================
+            classification strategy with 3 trees
+            ------------------------------------
+            classification tree 1 () (2 () (3 () ()))
+            s3 >= 0
+            s2 >= 0
+            s1 >= 0
+            s0 > s2 + s3 + 1
+            ------------------------------------
+            classification tree 2 (1 () ()) (3 () ())
+            s2 + s3 + 1 >= s0
+            s3 >= 0
+            s2 >= 0
+            s1 >= 0
+            s0 >= 0
+            s0 + s1 + 1 >= s3
+            ------------------------------------
+            classification tree 3 (2 (1 () ()) ()) ()
+            s3 > s0 + s1 + 1
+            s2 >= 0
+            s1 >= 0
+            s0 >= 0
+            ====================================
+            classification strategy with 4 trees
+            ------------------------------------
+            classification tree 1 () (2 () (3 () ()))
+            s3 >= 0
+            s2 >= 0
+            s1 >= s3
+            s0 >= 0
+            s0 + s1 >= 2*s3
+            2*s0 + s1 >= s2 + 2*s3
+            ------------------------------------
+            classification tree 1 () (3 (2 () ()) ())
+            s3 > s1
+            s2 >= 0
+            s1 >= 0
+            s0 >= s3
+            2*s0 > s2 + s3
+            ------------------------------------
+            classification tree 3 (1 () (2 () ())) ()
+            2*s3 > s0 + s1
+            s3 > s0
+            s2 >= 0
+            s1 >= 0
+            s0 > s2
+            ------------------------------------
+            classification tree 3 (2 (1 () ()) ()) ()
+            s2 + 2*s3 > 2*s0 + s1
+            s2 + s3 >= 2*s0
+            s2 >= s0
+            s3 >= 0
+            s1 >= 0
+            s0 >= 0
+            ====================================
+            classification strategy with 5 trees
+            ------------------------------------
+            classification tree 1 () (2 () (3 () ()))
+            s3 >= 0
+            s2 >= 0
+            s1 >= s3
+            s0 > s2 + s3 + 1
+            ------------------------------------
+            classification tree 1 () (3 (2 () ()) ())
+            s3 > s1
+            s2 >= 0
+            s1 >= 0
+            s0 > s1 + s2 + 1
+            s0 >= s3
+            ------------------------------------
+            classification tree 2 (1 () ()) (3 () ())
+            s2 + s3 + 1 >= s0
+            s1 + s2 + 1 >= s0
+            s3 >= 0
+            s2 >= 0
+            s1 >= 0
+            s1 + s2 + 1 >= s3
+            s0 >= 0
+            s0 + s1 + 1 >= s3
+            ------------------------------------
+            classification tree 3 (1 () (2 () ())) ()
+            s3 > s0
+            s3 > s1 + s2 + 1
+            s2 >= 0
+            s1 >= 0
+            s0 > s2
+            ------------------------------------
+            classification tree 3 (2 (1 () ()) ()) ()
+            s3 > s0 + s1 + 1
+            s2 >= s0
+            s1 >= 0
+            s0 >= 0
+        """
+        if not self.is_symmetric(polyhedra=True):
+            raise ValueError('classification strategy is not symmetric')
+        return iter(cs
+                    for cs in self.nonempty_subsets()
+                    if cs.is_symmetric(polyhedra=False))
