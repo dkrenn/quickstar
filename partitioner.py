@@ -193,11 +193,24 @@ class ClassificationTree(SageObject):
 
         return eq(self, other)
 
+    def polyhedron_equals(self, other, mirrored=False):
+        if mirrored:
+            return self.polyhedron == mirror_polyhedron(other.polyhedron)
+        else:
+            return self.polyhedron == other.polyhedron
+
     def __eq__(self, other):
         return self.tree_equals(other) and self.polyhedon == other.polyhedon
 
     def is_mirroring_tree_of(self, other):
         return self.tree_equals(other, mirrored=True)
+
+    def is_mirroring_polyhedron_of(self, other):
+        return self.polyhedron_equals(other, mirrored=True)
+
+    def is_mirroring_of(self, other, polyhedra=True):
+        return (self.is_mirroring_tree_of(other) and
+                (not polyhedra or self.is_mirroring_polyhedron_of(other)))
 
 
 def classification_trees(r):
