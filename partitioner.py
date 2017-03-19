@@ -140,6 +140,65 @@ class ClassificationTree(SageObject):
                     return current.top, comparisons
                 current = current.right
 
+    def tree_equals(self, other, mirrored=False):
+        r"""
+        EXAMPLES:
+
+            sage: from partitioner import ClassificationStrategy
+
+            sage: cs2 = ClassificationStrategy(2)
+            sage: Matrix([[a.tree_equals(b) for a in cs2.trees]
+            ....:         for b in cs2.trees])
+            [1 0]
+            [0 1]
+            sage: Matrix([[a.tree_equals(b, mirrored=True) for a in cs2.trees]
+            ....:         for b in cs2.trees])
+            [0 1]
+            [1 0]
+
+            sage: cs3 = ClassificationStrategy(3)
+            sage: Matrix([[a.tree_equals(b) for a in cs3.trees]
+            ....:         for b in cs3.trees])
+            [1 0 0 0 0]
+            [0 1 0 0 0]
+            [0 0 1 0 0]
+            [0 0 0 1 0]
+            [0 0 0 0 1]
+            sage: Matrix([[a.tree_equals(b, mirrored=True) for a in cs3.trees]
+            ....:         for b in cs3.trees])
+            [0 0 0 0 1]
+            [0 0 0 1 0]
+            [0 0 1 0 0]
+            [0 1 0 0 0]
+            [1 0 0 0 0]
+        """
+        indices = self.indices()
+        if indices != other.indices():
+            return False
+        indices = indices[1:]
+        mapping = {j: i for i, j
+                   in zip(indices, reversed(indices) if mirrored else indices)}
+
+        def eq(s, o):
+            if s is None and o is None:
+                return True
+            if (s is None) != (o is None):
+                return False
+            if s.top != mapping[o.top]:
+                return False
+            if mirrored:
+                return eq(s.left, o.right) and eq(s.right, o.left)
+            else:
+                return eq(s.left, o.left) and eq(s.right, o.right)
+
+        return eq(self, other)
+
+    def __eq__(self, other):
+        return self.tree_equals(other) and self.polyhedra == other.polyhedra
+
+    def is_mirroring_tree_of(self, other):
+        return self.tree_equals(other, mirrored=True)
+
 
 def classification_trees(r):
     if not r:
