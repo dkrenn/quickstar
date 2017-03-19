@@ -194,7 +194,7 @@ class ClassificationTree(SageObject):
         return eq(self, other)
 
     def __eq__(self, other):
-        return self.tree_equals(other) and self.polyhedra == other.polyhedra
+        return self.tree_equals(other) and self.polyhedon == other.polyhedon
 
     def is_mirroring_tree_of(self, other):
         return self.tree_equals(other, mirrored=True)
