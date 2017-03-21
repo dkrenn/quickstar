@@ -583,7 +583,7 @@ class ClassificationStrategy(SageObject):
                      for other in others] + vars
             ineq_matrix = [get_vector(ineq, vars) for ineq in ineqs]
             P = Polyhedron(ieqs=ineq_matrix)
-            if self._disjoint_:
+            if self.is_disjoint():
                 P = polyhedron_break_tie(P)
             tree.polyhedron = P
 
@@ -591,7 +591,7 @@ class ClassificationStrategy(SageObject):
                                                for dd in range(1, d+1+1)])
         assert all(A.polyhedron & nonnegative_orthant == A.polyhedron
                    for A in self.trees)
-        if self._disjoint_:
+        if self.is_disjoint():
             assert all((A.polyhedron & B.polyhedron).is_empty()
                        for A in self.trees for B in self.trees if A != B)
 
@@ -610,7 +610,7 @@ class ClassificationStrategy(SageObject):
             '------------------------------------' + '\n' +
             'classification tree {}'.format(tree) + '\n' +
             tree.repr_pretty_polyhedron(
-                strict_inequality=self._disjoint_)
+                strict_inequality=self.is_disjoint())
             for tree in self.trees))
 
     def indices(self):
@@ -619,6 +619,9 @@ class ClassificationStrategy(SageObject):
 
     def dimension(self):
         return self._dimension_
+
+    def is_disjoint(self):
+        return self._disjoint_
 
     def H(self):
         from sage.modules.free_module_element import vector
@@ -691,7 +694,7 @@ class ClassificationStrategy(SageObject):
         from sage.misc.misc import subsets
         d = self.dimension()
         return iter(ClassificationStrategy(d,
-                                           make_disjoint=self._disjoint_,
+                                           make_disjoint=self.is_disjoint(),
                                            trees=srees)
                     for srees in subsets(self.trees)
                     if srees)
