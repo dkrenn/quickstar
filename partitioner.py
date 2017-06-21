@@ -212,6 +212,27 @@ class ClassificationTree(SageObject):
         return (self.is_mirroring_tree_of(other) and
                 (not polyhedra or self.is_mirroring_polyhedron_of(other)))
 
+    def generating_function_of_polyhedron(self, split=False):
+        r"""
+        EXAMPLES::
+
+            sage: from partitioner import ClassificationStrategy
+
+            sage: cs = ClassificationStrategy(2)
+            sage: for t in cs.trees:
+            ....:     print(sum(h.value() for h in t.generating_function_of_polyhedron(split=True)))
+            1/(-y0^2*y1*y2 + y0^2*y2 + y0*y1*y2 + y0*y1 - y0*y2 - y0 - y1 + 1)
+            1/(-y0*y1*y2^2 + y0*y1*y2 + y0*y2^2 - y0*y2 + y1*y2 - y1 - y2 + 1)
+        """
+        if split is True:
+            split = tuple(split_polyhedra(len(self.indices())))
+        if self.polyhedron is None:
+            raise ValueError('polyhedron not defined')
+        return self.polyhedron.generating_function_of_integral_points(
+            indices=self.indices(),
+            result_as_tuple=True,
+            split=split)
+
 
 def classification_trees(r):
     if not r:
